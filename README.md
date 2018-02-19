@@ -1,6 +1,6 @@
-# Popular Movies Project Stage 1
+# Popular Movies Project
 
-## Udacity Android Developer Nanodegree Project 2, Sandwich Club
+## Udacity Android Developer Nanodegree Project 2 and 3, Popular Movies Stage 1 and 2
 
 ## Project Overview
 ### Stage 1
