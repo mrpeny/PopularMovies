@@ -21,6 +21,15 @@ import eu.captaincode.popularmovies.BuildConfig;
  */
 
 public class NetworkUtils {
+    /**
+     * Secure base image URL for accessing TMDB images
+     */
+    private static final String BASE_IMAGE_URL_TMDB = "https://image.tmdb.org/t/p";
+    /**
+     * Path for image size specification to append
+     */
+    private static final String IMAGE_SIZE_PATH_TMDB = "w185";
+
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     private static final String BASE_URL_TMDB = "https://api.themoviedb.org/3";
@@ -43,7 +52,8 @@ public class NetworkUtils {
     public static URL getMovieListQueryUrl(Context context) {
         Uri tmdbUri = buildBaseUriWithLanguageAndApi();
 
-        boolean popularSorted = true;
+        // This validation will be implemented later
+        boolean popularSorted = false;
         if (popularSorted) {
             String moviePopularEndpoint = Uri.decode(MOVIE_POPULAR_ENDPOINT_TMDB);
             tmdbUri = tmdbUri.buildUpon().appendEncodedPath(moviePopularEndpoint).build();
@@ -69,11 +79,11 @@ public class NetworkUtils {
     }
 
     /**
-     * Builds up https URLConnection for the given URL and returns the response received from the
+     * Builds up https URLConnection for the given URL and returns the received json from the
      * server based on the url argument.
      *
      * @param url the url containing the query that will be requested from the server
-     * @return the response from the server based on the given url
+     * @return the json response from the server based on the given url
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         // TODO: Create Network Security Config for https connection {@see https://developer.android.com/training/articles/security-config.html}
@@ -94,6 +104,22 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    /**
+     * Creates a valid The Movie DB Uri pointing to a poster image.
+     *
+     * @param imagePath the last path segment containing the image filename and extension
+     *                  eg: "/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg"
+     * @return the formatted Uri pointing to the image specified in the argument
+     */
+    public static Uri getImageUriFor(String imagePath) throws MalformedURLException {
+        if (imagePath.startsWith("/")) {
+            imagePath = imagePath.replaceFirst("/", "");
+        }
+        return Uri.parse(BASE_IMAGE_URL_TMDB).buildUpon()
+                .appendEncodedPath(IMAGE_SIZE_PATH_TMDB)
+                .appendEncodedPath(imagePath).build();
     }
 
     /* Helper methods for Uri and URL builds */
