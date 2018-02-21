@@ -113,7 +113,7 @@ public class NetworkUtils {
      *                  eg: "/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg"
      * @return the formatted Uri pointing to the image specified in the argument
      */
-    public static Uri getImageUriFor(String imagePath) throws MalformedURLException {
+    public static Uri getImageUriFor(String imagePath) {
         if (imagePath.startsWith("/")) {
             imagePath = imagePath.replaceFirst("/", "");
         }
