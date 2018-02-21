@@ -1,3 +1,7 @@
-<resources>
-    <string name="app_name">PopularMovies</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Popular Movies</string>
+    <!-- MainActivity texts -->
+    <string name="main_poster_iv_content_description">Movie poster for
+        <xliff:g example="The Godfather" id="movie_title">%1$s</xliff:g></string>
+    <string name="main_movie_poster_image">Movie poster image</string>
 </resources>

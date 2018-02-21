@@ -2,27 +2,25 @@ package eu.captaincode.popularmovies;
 
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
+import eu.captaincode.popularmovies.adapters.MovieListAdapter;
 import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
@@ -33,22 +31,26 @@ import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<String> {
 
+    private static final int MOVIE_LIST_LOADER_ID = 42;
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    TextView tv;
-    ImageView iv;
-
-    List<Movie> movieList = null;
+    private List<Movie> mMovieList = new ArrayList<>();
+    private MovieListAdapter mMovieListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tv = findViewById(R.id.main_tv);
-        iv = findViewById(R.id.main_iv);
+        RecyclerView mRecyclerView = findViewById(R.id.rv_main_movie_list);
+        mMovieListAdapter = new MovieListAdapter(this, mMovieList);
 
-        getSupportLoaderManager().initLoader(42, null, this);
+        mRecyclerView.setAdapter(mMovieListAdapter);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,
+                getResources().getInteger(R.integer.main_grid_span_count));
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        getSupportLoaderManager().initLoader(MOVIE_LIST_LOADER_ID, null, this);
     }
 
     @Override
@@ -61,48 +63,28 @@ public class MainActivity extends AppCompatActivity
         if (jsonString == null) {
             Toast.makeText(this, "Cannot connect to server. Check your internet connection!",
                     Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        /*try {
-            movieList = TmdbJsonUtils.parseMovieListFrom(jsonString);
+        try {
+            mMovieList = TmdbJsonUtils.parseMovieListFrom(jsonString);
         } catch (JSONException e) {
             Log.d(TAG, e.getMessage());
             e.printStackTrace();
         }
 
-        if (movieList != null) {
-            showUi(jsonString);
-        }*/
-
-        Movie movie = null;
-        try {
-            movie = TmdbJsonUtils.parseMovieFrom(jsonString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if (movie != null) {
-            showUi(movie);
+        if (mMovieList != null) {
+            updateUi();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-
+        mMovieListAdapter.setData(null);
     }
 
-    private void showUi(Movie movie) {
-        tv.setText(movie.getPosterPath());
-        Uri uri = null;
-        try {
-
-            uri = NetworkUtils.getImageUriFor(movie.getPosterPath());
-            Log.d(TAG, uri.toString());
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        Picasso.with(this).load(uri).into(iv);
+    private void updateUi() {
+        mMovieListAdapter.setData(mMovieList);
     }
 
     static class MovieLoader extends AsyncTaskLoader<String> {
@@ -118,12 +100,12 @@ public class MainActivity extends AppCompatActivity
         @Nullable
         @Override
         public String loadInBackground() {
-            URL url = NetworkUtils.getMovieDetailsQueryURL(getContext(), "211672");
+            URL url = NetworkUtils.getMovieListQueryUrl(getContext());
             String jsonString = null;
             try {
                 jsonString = NetworkUtils.getResponseFromHttpUrl(url);
             } catch (IOException e) {
-                Log.d("MainActivity", e.getMessage());
+                Log.d(TAG, e.getMessage());
                 e.printStackTrace();
             }
             return jsonString;

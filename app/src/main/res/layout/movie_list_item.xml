@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Caution: As soon as android:minHeight and android:minWidth properties are
+deleted from the ImageView and there is no placeholder set with Picasso
+ the movie_list_item.xml poster images don't show up in the RecyclerView. -->
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/iv_movie_list_item_poster"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:adjustViewBounds="true"
+    android:contentDescription="@string/main_movie_poster_image"
+    android:minHeight="185dp"
+    android:minWidth="275dp"
+    android:scaleType="centerCrop" />
