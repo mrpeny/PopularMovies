@@ -26,11 +26,12 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     private static final String TAG = MovieListAdapter.class.getSimpleName();
     private Context mContext;
     private List<Movie> mMovieList;
+    private OnMovieClickListener mOnMovieClickListener;
 
-    public MovieListAdapter(Context context, List<Movie> movieList) {
-        this.mContext = context;
+    public MovieListAdapter(Context context, List<Movie> movieList, OnMovieClickListener listener) {
+        mContext = context;
         mMovieList = movieList;
-        Log.d(TAG, "MovieListAdapter created");
+        mOnMovieClickListener = listener;
     }
 
     @Override
@@ -47,8 +48,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
 
         String posterPath = mMovieList.get(position).getPosterPath();
         Uri posterUri = NetworkUtils.getImageUriFor(posterPath);
-        Picasso.with(mContext).load(posterUri)
-                .into(holder.posterImageView);
+        Picasso.with(mContext).load(posterUri).into(holder.posterImageView);
     }
 
     @Override
@@ -67,12 +67,26 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         notifyDataSetChanged();
     }
 
-    class MovieListViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * Interface definition for a callback to be invoked when a Movie poster is clicked.
+     */
+    public interface OnMovieClickListener {
+        void onMovieClick(int position);
+    }
+
+    class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView posterImageView;
 
         MovieListViewHolder(View itemView) {
             super(itemView);
             posterImageView = itemView.findViewById(R.id.iv_movie_list_item_poster);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            mOnMovieClickListener.onMovieClick(position);
         }
     }
 }
