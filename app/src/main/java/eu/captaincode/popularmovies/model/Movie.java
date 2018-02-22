@@ -1,9 +1,23 @@
 package eu.captaincode.popularmovies.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Represents Movie object from The Movie Database.
  */
-public class Movie {
+public class Movie implements Parcelable {
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     private String title;
     private String posterPath;
     private String overView;
@@ -16,6 +30,28 @@ public class Movie {
         this.overView = overView;
         this.voteAverage = voteAverage;
         this.date = date;
+    }
+
+    protected Movie(Parcel in) {
+        title = in.readString();
+        posterPath = in.readString();
+        overView = in.readString();
+        voteAverage = in.readDouble();
+        date = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(posterPath);
+        dest.writeString(overView);
+        dest.writeDouble(voteAverage);
+        dest.writeString(date);
     }
 
     public String getTitle() {

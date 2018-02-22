@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="eu.captaincode.popularmovies.utilities.MovieDetailActivity">
+    tools:context="eu.captaincode.popularmovies.MovieDetailActivity">
 
     <TextView
         android:id="@+id/tv_movie_title_movie_detail"

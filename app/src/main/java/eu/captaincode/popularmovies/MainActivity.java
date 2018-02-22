@@ -23,7 +23,6 @@ import java.util.List;
 
 import eu.captaincode.popularmovies.adapters.MovieListAdapter;
 import eu.captaincode.popularmovies.model.Movie;
-import eu.captaincode.popularmovies.utilities.MovieDetailActivity;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMovieClick(int position) {
         Intent startMovieDetailIntent = new Intent(this, MovieDetailActivity.class);
-        startMovieDetailIntent.putExtra(EXTRA_KEY_MOVIE, mMovieList.get(position).getTitle());
+        startMovieDetailIntent.putExtra(EXTRA_KEY_MOVIE, mMovieList.get(position));
         startActivity(startMovieDetailIntent);
     }
 

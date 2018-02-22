@@ -1,14 +1,15 @@
-package eu.captaincode.popularmovies.utilities;
+package eu.captaincode.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import eu.captaincode.popularmovies.MainActivity;
-import eu.captaincode.popularmovies.R;
+import eu.captaincode.popularmovies.model.Movie;
 
 public class MovieDetailActivity extends AppCompatActivity {
+
+    Movie mMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +21,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         Intent startingIntent = getIntent();
         if (startingIntent != null) {
             // Temporary testing
-            titleTextView.setText(startingIntent.getStringExtra(MainActivity.EXTRA_KEY_MOVIE));
+            mMovie = startingIntent.getParcelableExtra(MainActivity.EXTRA_KEY_MOVIE);
         }
+
+        titleTextView.setText(mMovie.getTitle());
     }
 }
