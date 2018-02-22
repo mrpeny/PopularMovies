@@ -5,4 +5,15 @@
         <xliff:g example="The Godfather" id="movie_title">%1$s</xliff:g></string>
     <string name="main_movie_poster_image">Movie poster image</string>
     <string name="main_internet_error_toast_message">Cannot connect to server. Check your internet connection!</string>
+
+    <!-- Settings texts -->
+    <string name="menu_settings">Settings</string>
+
+    <!-- Preference texts -->
+    <string name="preference_title_sort_by">Sort by</string>
+    <string name="preference_key_sort_by" translatable="false">sort-by</string>
+    <string name="preference_option_sort_by_popular_label">Most popular</string>
+    <string name="preference_option_sort_by_top_rated_label">Top rated</string>
+    <string name="preference_option_sort_by_popular_value" translatable="false">most-popular</string>
+    <string name="preference_option_sort_by_top_rated_value" translatable="false">top-rated</string>
 </resources>

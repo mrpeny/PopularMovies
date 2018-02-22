@@ -1,8 +1,10 @@
 package eu.captaincode.popularmovies.utilities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.Scanner;
 import javax.net.ssl.HttpsURLConnection;
 
 import eu.captaincode.popularmovies.BuildConfig;
+import eu.captaincode.popularmovies.R;
 
 /**
  * Makes network calls to The Movie DB web api.
@@ -53,13 +56,16 @@ public class NetworkUtils {
         Uri tmdbUri = buildBaseUriWithLanguageAndApi();
 
         // This validation will be implemented later
-        boolean popularSorted = false;
-        if (popularSorted) {
-            String moviePopularEndpoint = Uri.decode(MOVIE_POPULAR_ENDPOINT_TMDB);
-            tmdbUri = tmdbUri.buildUpon().appendEncodedPath(moviePopularEndpoint).build();
-        } else {
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+
+        String sortBy = sharedPreferences.getString(context.getString(R.string.preference_key_sort_by), "");
+        if (sortBy.equals(context.getString(R.string.preference_option_sort_by_top_rated_value))) {
             String movieTopRatedEndpoint = Uri.decode(MOVIE_TOP_RATED_ENDPOINT_TMDB);
             tmdbUri = tmdbUri.buildUpon().appendEncodedPath(movieTopRatedEndpoint).build();
+        } else {
+            String moviePopularEndpoint = Uri.decode(MOVIE_POPULAR_ENDPOINT_TMDB);
+            tmdbUri = tmdbUri.buildUpon().appendEncodedPath(moviePopularEndpoint).build();
         }
         return buildUrlFrom(tmdbUri);
     }
