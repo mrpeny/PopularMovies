@@ -4,4 +4,5 @@
     <string name="main_poster_iv_content_description">Movie poster for
         <xliff:g example="The Godfather" id="movie_title">%1$s</xliff:g></string>
     <string name="main_movie_poster_image">Movie poster image</string>
+    <string name="main_internet_error_toast_message">Cannot connect to server. Check your internet connection!</string>
 </resources>

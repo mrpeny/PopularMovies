@@ -2,6 +2,7 @@ package eu.captaincode.popularmovies;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import eu.captaincode.popularmovies.adapters.MovieListAdapter;
 import eu.captaincode.popularmovies.model.Movie;
+import eu.captaincode.popularmovies.utilities.MovieDetailActivity;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
@@ -29,10 +31,11 @@ import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
  * Makes testing on app components in this development phase (MrPeny 2018.02.20.)
  */
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String> {
+        implements LoaderManager.LoaderCallbacks<String>, MovieListAdapter.OnMovieClickListener {
+    public static final String EXTRA_KEY_MOVIE = "movie-name";
 
-    private static final int MOVIE_LIST_LOADER_ID = 42;
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int MOVIE_LIST_LOADER_ID = 42;
 
     private List<Movie> mMovieList = new ArrayList<>();
     private MovieListAdapter mMovieListAdapter;
@@ -43,8 +46,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         RecyclerView mRecyclerView = findViewById(R.id.rv_main_movie_list);
-        mMovieListAdapter = new MovieListAdapter(this, mMovieList);
-
+        mMovieListAdapter = new MovieListAdapter(this, mMovieList, this);
         mRecyclerView.setAdapter(mMovieListAdapter);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.main_grid_span_count));
@@ -61,18 +63,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String jsonString) {
         if (jsonString == null) {
-            Toast.makeText(this, "Cannot connect to server. Check your internet connection!",
+            Toast.makeText(this, R.string.main_internet_error_toast_message,
                     Toast.LENGTH_SHORT).show();
             return;
         }
-
         try {
             mMovieList = TmdbJsonUtils.parseMovieListFrom(jsonString);
         } catch (JSONException e) {
             Log.d(TAG, e.getMessage());
             e.printStackTrace();
         }
-
         if (mMovieList != null) {
             updateUi();
         }
@@ -85,6 +85,13 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUi() {
         mMovieListAdapter.setData(mMovieList);
+    }
+
+    @Override
+    public void onMovieClick(int position) {
+        Intent startMovieDetailIntent = new Intent(this, MovieDetailActivity.class);
+        startMovieDetailIntent.putExtra(EXTRA_KEY_MOVIE, mMovieList.get(position).getTitle());
+        startActivity(startMovieDetailIntent);
     }
 
     static class MovieLoader extends AsyncTaskLoader<String> {
