@@ -48,7 +48,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         String posterPath = mMovieList.get(position).getPosterPath();
         Uri posterUri = NetworkUtils.getImageUriFor(posterPath);
         Picasso.with(mContext).load(posterUri)
-                //.placeholder(R.drawable.poster_placeholder)
                 .into(holder.posterImageView);
     }
 

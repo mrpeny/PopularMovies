@@ -7,6 +7,4 @@ deleted from the ImageView and there is no placeholder set with Picasso
     android:layout_height="wrap_content"
     android:adjustViewBounds="true"
     android:contentDescription="@string/main_movie_poster_image"
-    android:minHeight="185dp"
-    android:minWidth="275dp"
     android:scaleType="centerCrop" />
