@@ -1,10 +1,11 @@
 package eu.captaincode.popularmovies;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
 
+import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.model.Movie;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -14,9 +15,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_detail);
 
-        TextView titleTextView = findViewById(R.id.tv_movie_title_movie_detail);
+        ActivityMovieDetailBinding movieDetailBinding = DataBindingUtil.setContentView(this,
+                R.layout.activity_movie_detail);
 
         Intent startingIntent = getIntent();
         if (startingIntent != null) {
@@ -24,6 +25,6 @@ public class MovieDetailActivity extends AppCompatActivity {
             mMovie = startingIntent.getParcelableExtra(MainActivity.EXTRA_KEY_MOVIE);
         }
 
-        titleTextView.setText(mMovie.getTitle());
+        movieDetailBinding.setMovie(mMovie);
     }
 }
