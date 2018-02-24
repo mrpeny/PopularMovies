@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- MainActivity integer resources -->
+    <!-- MainActivity integer resources for landscape mode layout -->
     <integer name="main_grid_span_count">3</integer>
 </resources>
