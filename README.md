@@ -12,6 +12,6 @@ of the selected movie.
 
 ## Notes
 ### API Key
-TMDB API Key should be stored in gradle.properties in the root directory. Within gradke.properties
+TMDB API Key should be stored in gradle.properties in the root directory. Within gradle.properties
 you should define a properties in the following way:
 TmdbApiKey = "your-api-key-goes-here"
