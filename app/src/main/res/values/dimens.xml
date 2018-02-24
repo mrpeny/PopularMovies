@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General dimens -->
     <dimen name="padding_bottom_rv">8dp</dimen>
+    <dimen name="main_container_padding">16dp</dimen>
+
+    <!-- Toolbar dimens -->
+    <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="collapsing_toolbar_height">300dp</dimen>
+    <dimen name="poster_image_height_movie_detail">200dp</dimen>
+    <dimen name="movie_detail_poster_padding">16dp</dimen>
+    <dimen name="line_margin_movie_detail">8dp</dimen>
+    <dimen name="progress_bar_width_height">150dp</dimen>
 </resources>

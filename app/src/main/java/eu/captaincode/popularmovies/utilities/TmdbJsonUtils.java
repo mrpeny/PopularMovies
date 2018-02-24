@@ -16,20 +16,26 @@ import eu.captaincode.popularmovies.model.Movie;
  * Parses JSON strings received from The Movie DB into {@link Movie} objects and lists of them.
  */
 public class TmdbJsonUtils {
+    /**
+     * Pattern representing date strings used by TMDB Web API
+     */
+    public static final String DATE_FORMAT_TMDB = "yyyy-MM-dd";
+
     private static final String TAG = TmdbJsonUtils.class.getSimpleName();
 
     /* Movie List JSON property keys */
     // Type: JSONArray
     private static final String RESULTS_LIST_TMDB = "results";
 
-    /* Movie JSON property keys */
+    // Movie JSON property keys
     private static final String TITLE_TMDB = "title";
     private static final String POSTER_PATH_TMDB = "poster_path";
     private static final String OVERVIEW_TMDB = "overview";
     private static final String VOTE_AVERAGE_TMDB = "vote_average";
+    private static final String BACKDROP_PATH_TMDB = "backdrop_path";
     private static final String RELEASE_DATE_TMDB = "release_date";
 
-    /* TMDB JSON status property keys */
+    // TMDB JSON status property keys
     private static final String STATUS_CODE_TMDB = "status_code";
     private static final String STATUS_MESSAGE_TMDB = "status_message";
 
@@ -79,7 +85,6 @@ public class TmdbJsonUtils {
     }
 
     /* Helper methods */
-
     /**
      * Parses a{@link JSONObject} containing movie details to a {@link Movie} object.
      *
@@ -91,9 +96,10 @@ public class TmdbJsonUtils {
         String posterPath = movieJson.optString(POSTER_PATH_TMDB);
         String overview = movieJson.optString(OVERVIEW_TMDB);
         double voteAverage = movieJson.optDouble(VOTE_AVERAGE_TMDB);
+        String backdropPath = movieJson.optString(BACKDROP_PATH_TMDB);
         String releaseDate = movieJson.optString(RELEASE_DATE_TMDB);
 
-        return new Movie(title, posterPath, overview, voteAverage, releaseDate);
+        return new Movie(title, posterPath, overview, voteAverage, backdropPath, releaseDate);
     }
 
     private static boolean isQuerySuccessful(JSONObject jsonObject) {

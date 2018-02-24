@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Alternate image size resources for TMDB API used on screen sizes wider than 600 dp -->
+    <string name="backdrop_size_path_tmdb" translatable="false">w1280</string>
+    <string name="poster_size_path_tmdb" translatable="false">w342</string>
+</resources>

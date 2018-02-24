@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,16 +29,14 @@ import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
-/**
- * Makes testing on app components in this development phase (MrPeny 2018.02.20.)
- */
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<String>, MovieListAdapter.OnMovieClickListener {
     public static final String EXTRA_KEY_MOVIE = "movie-name";
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int MOVIE_LIST_LOADER_ID = 42;
-
+    private static int sPosition = RecyclerView.NO_POSITION;
+    RecyclerView mRecyclerView;
     private List<Movie> mMovieList = new ArrayList<>();
     private MovieListAdapter mMovieListAdapter;
 
@@ -46,12 +45,15 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RecyclerView mRecyclerView = findViewById(R.id.rv_main_movie_list);
+        mRecyclerView = findViewById(R.id.rv_main_movie_list);
         mMovieListAdapter = new MovieListAdapter(this, mMovieList, this);
         mRecyclerView.setAdapter(mMovieListAdapter);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.main_grid_span_count));
         mRecyclerView.setLayoutManager(layoutManager);
+
+        Toolbar myToolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(myToolbar);
 
         getSupportLoaderManager().initLoader(MOVIE_LIST_LOADER_ID, null, this);
     }
@@ -103,10 +105,13 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUi() {
         mMovieListAdapter.setData(mMovieList);
+        if (sPosition == RecyclerView.NO_POSITION) sPosition = 0;
+        mRecyclerView.scrollToPosition(sPosition);
     }
 
     @Override
     public void onMovieClick(int position) {
+        sPosition = position;
         Intent startMovieDetailIntent = new Intent(this, MovieDetailActivity.class);
         startMovieDetailIntent.putExtra(EXTRA_KEY_MOVIE, mMovieList.get(position));
         startActivity(startMovieDetailIntent);

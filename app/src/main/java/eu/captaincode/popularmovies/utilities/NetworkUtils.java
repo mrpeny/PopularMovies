@@ -24,14 +24,7 @@ import eu.captaincode.popularmovies.R;
  */
 
 public class NetworkUtils {
-    /**
-     * Secure base image URL for accessing TMDB images
-     */
     private static final String BASE_IMAGE_URL_TMDB = "https://image.tmdb.org/t/p";
-    /**
-     * Path for image size specification to append
-     */
-    private static final String IMAGE_SIZE_PATH_TMDB = "w185";
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
@@ -44,7 +37,6 @@ public class NetworkUtils {
     private static final String LANGUAGE_PARAM_TMDB = "language";
 
     private static final String DEFAULT_LANGUAGE_TAG_TMDB = "en-US";
-
 
     /**
      * Retrieves the URL for The Movie DB based on the user's sorting preferences.
@@ -113,22 +105,43 @@ public class NetworkUtils {
     }
 
     /**
-     * Creates a valid The Movie DB Uri pointing to a poster image.
+     * Creates a valid The Movie DB Uri pointing to a poster image considering resolution
+     * requirements of the screen size image.
      *
-     * @param imagePath the last path segment containing the image filename and extension
-     *                  eg: "/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg"
-     * @return the formatted Uri pointing to the image specified in the argument
+     * @param context    the application context used for resource retrieval
+     * @param posterPath the last path segment containing the image filename and extension
+     *                   eg: "/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg"
+     * @return the formatted Uri pointing to the poster image specified in the argument
      */
-    public static Uri getImageUriFor(String imagePath) {
+    public static Uri getPosterImageUriFor(Context context, String posterPath) {
+        String posterSize = context.getString(R.string.poster_size_path_tmdb);
+        return getImageUriFor(posterPath, posterSize);
+    }
+
+    /**
+     * Creates a valid The Movie DB Uri pointing to a backdrop image considering resolution
+     * requirements of the screen size image.
+     *
+     * @param context      the application context used for resource retrieval
+     * @param backdropPath the last path segment containing the image filename and extension
+     *                     eg: "/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg"
+     * @return the formatted Uri pointing to the backdrop image specified in the argument
+     */
+    public static Uri getBackdropImageUriFor(Context context, String backdropPath) {
+        String backdropSize = context.getString(R.string.backdrop_size_path_tmdb);
+        return getImageUriFor(backdropPath, backdropSize);
+    }
+
+    /* Helper methods for Uri and URL builds */
+    private static Uri getImageUriFor(String imagePath, String imageSizePath) {
         if (imagePath.startsWith("/")) {
             imagePath = imagePath.replaceFirst("/", "");
         }
         return Uri.parse(BASE_IMAGE_URL_TMDB).buildUpon()
-                .appendEncodedPath(IMAGE_SIZE_PATH_TMDB)
+                .appendEncodedPath(imageSizePath)
                 .appendEncodedPath(imagePath).build();
     }
 
-    /* Helper methods for Uri and URL builds */
     private static Uri buildBaseUriWithLanguageAndApi() {
         String languageTag = DEFAULT_LANGUAGE_TAG_TMDB;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
