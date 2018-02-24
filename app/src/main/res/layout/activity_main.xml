@@ -22,4 +22,14 @@
             app:layout_scrollFlags="scroll|enterAlways" />
 
     </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:id="@+id/tv_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="@dimen/padding_bottom_rv"
+        android:drawableTop="@drawable/poster_placeholder"
+        android:text="@string/main_internet_error_toast_message"
+        android:visibility="gone" />
 </android.support.design.widget.CoordinatorLayout>

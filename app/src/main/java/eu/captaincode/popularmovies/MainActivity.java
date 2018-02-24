@@ -15,7 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import org.json.JSONException;
 
@@ -31,7 +31,7 @@ import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<String>, MovieListAdapter.OnMovieClickListener {
-    public static final String EXTRA_KEY_MOVIE = "movie-name";
+    public static final String EXTRA_KEY_MOVIE = "movie";
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int MOVIE_LIST_LOADER_ID = 42;
@@ -83,8 +83,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String jsonString) {
         if (jsonString == null) {
-            Toast.makeText(this, R.string.main_internet_error_toast_message,
-                    Toast.LENGTH_SHORT).show();
+            findViewById(R.id.tv_empty_view).setVisibility(View.VISIBLE);
             return;
         }
         try {
@@ -104,6 +103,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUi() {
+        findViewById(R.id.tv_empty_view).setVisibility(View.GONE);
         mMovieListAdapter.setData(mMovieList);
         if (sPosition == RecyclerView.NO_POSITION) sPosition = 0;
         mRecyclerView.scrollToPosition(sPosition);
