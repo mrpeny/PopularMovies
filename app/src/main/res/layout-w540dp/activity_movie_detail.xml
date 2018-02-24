@@ -99,12 +99,12 @@
                     android:id="@+id/fl_vote_average_movie_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="175dp"
-                    app:layout_constraintEnd_toEndOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintLeft_toLeftOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintRight_toRightOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintStart_toStartOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintTop_toTopOf="@id/iv_poster_image_movie_detail">
+                    app:layout_constraintBottom_toBottomOf="@id/iv_poster_image_movie_detail"
+                    app:layout_constraintEnd_toEndOf="@id/tv_movie_title_movie_detail"
+                    app:layout_constraintLeft_toLeftOf="@id/tv_movie_title_movie_detail"
+                    app:layout_constraintRight_toRightOf="@id/tv_movie_title_movie_detail"
+                    app:layout_constraintStart_toStartOf="@id/tv_movie_title_movie_detail"
+                    app:layout_constraintTop_toTopOf="@id/tv_release_date_movie_detail">
 
                     <ProgressBar
                         android:id="@+id/circularProgressbar"
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="100dp"
+                    android:layout_marginTop="16dp"
                     android:text="@{movie.overView}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"

@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO: Change menu item to spinner
+        // {@see http://www.viralandroid.com/2016/03/how-to-add-spinner-dropdown-list-to-android-actionbar-toolbar.html}
+        // {@see http://tomazwang.logdown.com/posts/1016846}
         getMenuInflater().inflate(R.menu.movie_list, menu);
         return true;
     }
