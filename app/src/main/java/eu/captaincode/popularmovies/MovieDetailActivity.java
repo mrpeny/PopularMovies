@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,12 +16,20 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.model.Movie;
+import eu.captaincode.popularmovies.model.Video;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
+import eu.captaincode.popularmovies.utilities.VideoListResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
@@ -89,5 +98,43 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         movieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
                 PERCENT_MULTIPLIER_VOTE_AVERAGE));
+
+        showVideos();
+    }
+
+    private void showVideos() {
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(NetworkUtils.BASE_URL_TMDB)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
+        final Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
+                NetworkUtils.getSystemLanguageTag());
+
+        call.enqueue(new Callback<VideoListResponse>() {
+            @Override
+            public void onResponse(@NonNull final Call<VideoListResponse> call,
+                                   @NonNull final Response<VideoListResponse> response) {
+                if (response.isSuccessful()) {
+                    VideoListResponse videoListResponse = response.body();
+                    if (videoListResponse != null) {
+                        List<Video> videoList = videoListResponse.getVideoList();
+                        for (Video video : videoList) {
+                            // Temporary test
+                            Log.d(TAG, NetworkUtils.getYouTubeVideoUrlFor(video.getKey()).toString());
+                        }
+                    } else {
+                        Log.d(TAG, "No videos belong to this Movie");
+                    }
+                } else {
+                    Log.d(TAG, "Failed to download movie videos");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<VideoListResponse> call, @NonNull Throwable t) {
+                Log.d(TAG, t.getMessage());
+            }
+        });
     }
 }

@@ -18,25 +18,36 @@ import javax.net.ssl.HttpsURLConnection;
 
 import eu.captaincode.popularmovies.BuildConfig;
 import eu.captaincode.popularmovies.R;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Makes network calls to The Movie DB web api.
  */
 
 public class NetworkUtils {
-    private static final String BASE_IMAGE_URL_TMDB = "https://image.tmdb.org/t/p";
-
+    // The Movie DB related fields
+    public static final String BASE_URL_TMDB = "https://api.themoviedb.org/3/";
     private static final String TAG = NetworkUtils.class.getSimpleName();
-
-    private static final String BASE_URL_TMDB = "https://api.themoviedb.org/3";
+    private static final String BASE_IMAGE_URL_TMDB = "https://image.tmdb.org/t/p";
     private static final String MOVIE_POPULAR_ENDPOINT_TMDB = "movie/popular";
     private static final String MOVIE_TOP_RATED_ENDPOINT_TMDB = "movie/top_rated";
+    private static final String MOVIE_VIDEOS_ENDPOINT_TMDB = "movie/{movie_id}/videos";
+    private static final String MOVIE_REVIEWS_ENDPOINT_TMDB = "movie/{movie_id}/reviews";
     private static final String MOVIE_DETAILS_ENDPOINT_TMDB = "movie";
 
+
+    private static final String MOVIE_ID_PATH_SEGMENT_TMDB = "movie_id";
     private static final String API_KEY_PARAM_TMDB = "api_key";
     private static final String LANGUAGE_PARAM_TMDB = "language";
 
     private static final String DEFAULT_LANGUAGE_TAG_TMDB = "en-US";
+
+    // YouTube related fields
+    private static final String BASE_URL_YOUTUBE = "https://www.youtube.com/watch/";
+    private static final String VIDEO_ID_PARAM_YOUTUBE = "v";
 
     /**
      * Retrieves the URL for The Movie DB based on the user's sorting preferences.
@@ -132,6 +143,32 @@ public class NetworkUtils {
         return getImageUriFor(backdropPath, backdropSize);
     }
 
+    /**
+     * Creates a valid YouTube URL pointing to the video which id was specified of.
+     *
+     * @param videoId the YouTube id of the video to build the URL for
+     * @return the URL pointing to the video on YouTubeŁ
+     */
+    public static URL getYouTubeVideoUrlFor(String videoId) {
+        Uri videoUri = Uri.parse(BASE_URL_YOUTUBE).buildUpon()
+                .appendQueryParameter(VIDEO_ID_PARAM_YOUTUBE, videoId).build();
+
+        return buildUrlFrom(videoUri);
+    }
+
+    /**
+     * Returns Gets default Locale of the system and returns its language tag.
+     *
+     * @return the TMDB compatible, ISO 639-1 language tag of the system
+     */
+    public static String getSystemLanguageTag() {
+        String languageTag = DEFAULT_LANGUAGE_TAG_TMDB;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            languageTag = Locale.getDefault().toLanguageTag();
+        }
+        return languageTag;
+    }
+
     /* Helper methods for Uri and URL builds */
     private static Uri getImageUriFor(String imagePath, String imageSizePath) {
         if (imagePath.startsWith("/")) {
@@ -143,10 +180,7 @@ public class NetworkUtils {
     }
 
     private static Uri buildBaseUriWithLanguageAndApi() {
-        String languageTag = DEFAULT_LANGUAGE_TAG_TMDB;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            languageTag = Locale.getDefault().toLanguageTag();
-        }
+        final String languageTag = getSystemLanguageTag();
         return Uri.parse(BASE_URL_TMDB).buildUpon()
                 .appendQueryParameter(LANGUAGE_PARAM_TMDB, languageTag)
                 .appendQueryParameter(API_KEY_PARAM_TMDB, BuildConfig.API_KEY)
@@ -155,12 +189,17 @@ public class NetworkUtils {
 
     private static URL buildUrlFrom(Uri uri) {
         try {
-            URL queryUrl = new URL(uri.toString());
-            Log.d(TAG, queryUrl.toString());
-            return queryUrl;
+            return new URL(uri.toString());
         } catch (MalformedURLException e) {
             Log.d(TAG, e.getMessage());
             return null;
         }
+    }
+
+    public interface TmdbServiceApi {
+        @GET(BASE_URL_TMDB + MOVIE_VIDEOS_ENDPOINT_TMDB + "?" + API_KEY_PARAM_TMDB + "="
+                + BuildConfig.API_KEY)
+        Call<VideoListResponse> getVideosForMovie(@Path(MOVIE_ID_PATH_SEGMENT_TMDB) int movieId,
+                                                  @Query(LANGUAGE_PARAM_TMDB) String languageTag);
     }
 }
