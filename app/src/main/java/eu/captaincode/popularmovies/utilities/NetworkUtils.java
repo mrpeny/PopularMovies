@@ -46,7 +46,9 @@ public class NetworkUtils {
     private static final String DEFAULT_LANGUAGE_TAG_TMDB = "en-US";
 
     // YouTube related fields
-    private static final String BASE_URL_YOUTUBE = "https://www.youtube.com/watch/";
+    private static final String BASE_URL_YOUTUBE = "https://www.youtube.com/";
+    private static final String BASE_THUMBNAIL_URL_YOUTUBE = "https://img.youtube.com/vi/";
+    private static final String VIDEO_WATCH_PATH_YOUTUBE = "watch";
     private static final String VIDEO_ID_PARAM_YOUTUBE = "v";
 
     /**
@@ -147,13 +149,28 @@ public class NetworkUtils {
      * Creates a valid YouTube URL pointing to the video which id was specified of.
      *
      * @param videoId the YouTube id of the video to build the URL for
-     * @return the URL pointing to the video on YouTubeŁ
+     * @return the URL pointing to the video on YouTube
      */
     public static URL getYouTubeVideoUrlFor(String videoId) {
         Uri videoUri = Uri.parse(BASE_URL_YOUTUBE).buildUpon()
+                .appendEncodedPath(VIDEO_WATCH_PATH_YOUTUBE)
                 .appendQueryParameter(VIDEO_ID_PARAM_YOUTUBE, videoId).build();
 
         return buildUrlFrom(videoUri);
+    }
+
+    /**
+     * Creates a valid YouTube URL pointing to the thumbnail image which id was specified of.
+     *
+     * @param videoId the YouTube id of the video to build the URL for
+     * @return the URL pointing to the video thumbnail on YouTube
+     */
+    public static Uri getYouTubeThumbnailImageFor(String videoId) {
+        Uri thumbnailUri = Uri.parse(BASE_THUMBNAIL_URL_YOUTUBE).buildUpon()
+                .appendEncodedPath(videoId)
+                .appendEncodedPath("mqdefault.jpg")
+                .build();
+        return thumbnailUri;
     }
 
     /**

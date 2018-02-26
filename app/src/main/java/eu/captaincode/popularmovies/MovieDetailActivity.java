@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
@@ -15,10 +17,13 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import eu.captaincode.popularmovies.adapters.VideoListAdapter;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.model.Video;
@@ -37,13 +42,15 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private ActivityMovieDetailBinding movieDetailBinding;
     private Movie mMovie;
+    private List<Video> mVideoList = new ArrayList<>();
+
+    VideoListAdapter videoListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        movieDetailBinding = DataBindingUtil.setContentView(this,
-                R.layout.activity_movie_detail);
+        movieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
 
         Toolbar toolbar = findViewById(R.id.toolbar_movie_detail);
         setSupportActionBar(toolbar);
@@ -60,6 +67,12 @@ public class MovieDetailActivity extends AppCompatActivity {
             Log.d(TAG, "No movie object passed");
             return;
         }
+
+        videoListAdapter = new VideoListAdapter(this, mVideoList);
+        movieDetailBinding.rvVideosMovieDetail.setAdapter(videoListAdapter);
+        RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.HORIZONTAL, false);
+        movieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
 
         showMovieDetails();
     }
@@ -119,9 +132,14 @@ public class MovieDetailActivity extends AppCompatActivity {
                     VideoListResponse videoListResponse = response.body();
                     if (videoListResponse != null) {
                         List<Video> videoList = videoListResponse.getVideoList();
-                        for (Video video : videoList) {
+
+                        for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
+                            Video video = iterator.next();
+                            if (!video.getType().equals("Trailer")) {
+                                iterator.remove();
+                            }
                             // Temporary test
-                            Log.d(TAG, NetworkUtils.getYouTubeVideoUrlFor(video.getKey()).toString());
+                            videoListAdapter.setData(videoList);
                         }
                     } else {
                         Log.d(TAG, "No videos belong to this Movie");
