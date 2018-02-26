@@ -12,6 +12,7 @@ of the selected movie.
 
 ### Stage 2
 In Stage 2 I will add more details to the Movie Detail View such as available trailers and reviews.
+User will be able to mark and save movies as favourites.
 
 ## Notes
 ### API Key
