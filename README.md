@@ -10,6 +10,9 @@ show posters in a grid based on user's list preference.
 Clicking on a poster will transition to a detailed view
 of the selected movie.
 
+### Stage 2
+In Stage 2 I will add more details to the Movie Detail View such as available trailers and reviews.
+
 ## Notes
 ### API Key
 TMDB API Key should be stored in gradle.properties in the root directory. Within gradle.properties
