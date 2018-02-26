@@ -28,6 +28,7 @@ public class TmdbJsonUtils {
     private static final String RESULTS_LIST_TMDB = "results";
 
     // Movie JSON property keys
+    private static final String ID_TMDB = "id";
     private static final String TITLE_TMDB = "title";
     private static final String POSTER_PATH_TMDB = "poster_path";
     private static final String OVERVIEW_TMDB = "overview";
@@ -92,6 +93,7 @@ public class TmdbJsonUtils {
      * @return the {@link Movie} object parsed details if successful
      */
     private static Movie parseMovieFrom(JSONObject movieJson) throws JSONException {
+        int id = movieJson.optInt(ID_TMDB);
         String title = movieJson.optString(TITLE_TMDB);
         String posterPath = movieJson.optString(POSTER_PATH_TMDB);
         String overview = movieJson.optString(OVERVIEW_TMDB);
@@ -99,7 +101,7 @@ public class TmdbJsonUtils {
         String backdropPath = movieJson.optString(BACKDROP_PATH_TMDB);
         String releaseDate = movieJson.optString(RELEASE_DATE_TMDB);
 
-        return new Movie(title, posterPath, overview, voteAverage, backdropPath, releaseDate);
+        return new Movie(id, title, posterPath, overview, voteAverage, backdropPath, releaseDate);
     }
 
     private static boolean isQuerySuccessful(JSONObject jsonObject) {

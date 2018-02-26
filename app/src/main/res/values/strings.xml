@@ -22,6 +22,8 @@
     <!-- MovieDetailActivity texts -->
     <string name="release_date_movie_detail">Release date:
         <xliff:g example="February 7, 2018" id="release_date">%1$s</xliff:g></string>
+    <string name="movie_detail_video_thumbnail_image">Movie Trailer thumbnail image</string>
+
 
     <!-- TMDB Web Api parameters -->
     <string name="backdrop_size_path_tmdb" translatable="false">w780</string>
