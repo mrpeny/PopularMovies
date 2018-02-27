@@ -33,7 +33,6 @@ public class MovieProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mMovieDbHelper = new MovieDbHelper(getContext());
-
         return true;
     }
 
@@ -74,6 +73,7 @@ public class MovieProvider extends ContentProvider {
                             values);
                     if (rowId > 0) {
                         getContext().getContentResolver().notifyChange(uri, null);
+                        sqLiteDatabase.setTransactionSuccessful();
                         return ContentUris.withAppendedId(MovieContract.MovieEntry.CONTENT_URI,
                                 rowId);
                     }
@@ -85,6 +85,31 @@ public class MovieProvider extends ContentProvider {
         throw new UnsupportedOperationException("Unknown uri: " + uri);
     }
 
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        int numRowsDeleted;
+
+        if (selection == null) selection = "1";
+
+        switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIE:
+                numRowsDeleted = mMovieDbHelper.getWritableDatabase().delete(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
+        }
+
+        if (numRowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsDeleted;
+    }
+
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -92,12 +117,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
-    }
-
-    @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        throw new RuntimeException("The update operation is not implemented.");
     }
 }
