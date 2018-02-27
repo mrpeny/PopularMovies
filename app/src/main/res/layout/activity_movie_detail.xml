@@ -46,6 +46,13 @@
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            style="@style/FabStyle"
+            android:onClick="onFabClick"
+            app:layout_anchor="@id/abl_main_movie_detail"
+            app:layout_anchorGravity="bottom|right|end" />
+
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -72,7 +79,6 @@
                     android:id="@+id/tv_movie_title_movie_detail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/movie_detail_poster_padding"
                     android:layout_marginStart="@dimen/movie_detail_poster_padding"
                     android:text="@{movie.title}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"

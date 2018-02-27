@@ -28,4 +28,8 @@
     <!-- TMDB Web Api parameters -->
     <string name="backdrop_size_path_tmdb" translatable="false">w780</string>
     <string name="poster_size_path_tmdb" translatable="false">w185</string>
+
+    <!-- AndroidManifest strings -->
+    <string name="content_authority" translatable="false">eu.captaincode.popularmovies</string>
+
 </resources>

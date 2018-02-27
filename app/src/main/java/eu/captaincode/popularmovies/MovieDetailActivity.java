@@ -1,6 +1,7 @@
 package eu.captaincode.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -24,9 +27,11 @@ import java.util.List;
 import java.util.Locale;
 
 import eu.captaincode.popularmovies.adapters.VideoListAdapter;
+import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.model.Video;
+import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 import eu.captaincode.popularmovies.utilities.VideoListResponse;
@@ -39,12 +44,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
     private static final int PERCENT_MULTIPLIER_VOTE_AVERAGE = 10;
-
+    VideoListAdapter videoListAdapter;
     private ActivityMovieDetailBinding movieDetailBinding;
     private Movie mMovie;
     private List<Video> mVideoList = new ArrayList<>();
-
-    VideoListAdapter videoListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +141,6 @@ public class MovieDetailActivity extends AppCompatActivity {
                             if (!video.getType().equals("Trailer")) {
                                 iterator.remove();
                             }
-                            // Temporary test
                             videoListAdapter.setData(videoList);
                         }
                     } else {
@@ -154,5 +156,29 @@ public class MovieDetailActivity extends AppCompatActivity {
                 Log.d(TAG, t.getMessage());
             }
         });
+    }
+
+    public void onFabClick(View view) {
+        String changeId = "0";
+        if (!mMovie.isFavorite()) {
+            mMovie.setFavorite(true);
+            Uri movieUri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, MovieObjectRelationMapper.toContentValues(mMovie));
+            Log.d(TAG, movieUri.toString());
+            changeId = movieUri.getLastPathSegment();
+        } else if (mMovie.isFavorite()) {
+            mMovie.setFavorite(false);
+            getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?", new String[]{String.valueOf(mMovie.getId())});
+        }
+        Cursor cursor = getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, MovieContract.MovieEntry._ID + "= ?", new String[]{changeId}, null);
+
+        if (cursor.moveToFirst()) {
+            int index = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVORITE);
+            int favorite = cursor.getInt(index);
+            Toast.makeText(this, "favorite: " + favorite, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Cursor empty", Toast.LENGTH_SHORT).show();
+        }
+
+        cursor.close();
     }
 }
