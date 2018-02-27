@@ -41,6 +41,6 @@ public class MovieContract {
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
         public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_FAVORITE = "favorite";
     }
-
 }

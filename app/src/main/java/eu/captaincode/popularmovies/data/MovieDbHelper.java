@@ -11,7 +11,7 @@ import eu.captaincode.popularmovies.data.MovieContract.MovieEntry;
  */
 
 public class MovieDbHelper extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "popular_movies.db";
+    public static final String DATABASE_NAME = "movie.db";
 
     private static final int DATABASE_VERSION = 1;
 
@@ -30,14 +30,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                         MovieEntry.COLUMN_OVERVIEW + " TEXT, " +
                         MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
                         MovieEntry.COLUMN_BACKDROP_PATH + " TEXT, " +
-                        MovieEntry.COLUMN_DATE + " TEXT not null" +
+                        MovieEntry.COLUMN_DATE + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_FAVORITE + " INTEGER DEFAULT 0 );";
 
-                        ");";
-
-        /*
-         * After we've spelled out our SQLite table creation statement above, we actually execute
-         * that SQL with the execSQL method of our SQLite database object.
-         */
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
     }
 

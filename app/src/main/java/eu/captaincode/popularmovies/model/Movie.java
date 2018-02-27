@@ -25,6 +25,10 @@ public class Movie implements Parcelable {
     private double voteAverage;
     private String backdropPath;
     private String date;
+    private boolean favorite = false;
+
+    public Movie() {
+    }
 
     public Movie(int id, String title, String posterPath, String overView, double voteAverage,
                  String backdropPath, String date) {
@@ -117,5 +121,13 @@ public class Movie implements Parcelable {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }
