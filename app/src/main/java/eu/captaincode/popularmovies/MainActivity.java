@@ -30,12 +30,14 @@ import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String>, MovieListAdapter.OnMovieClickListener {
+        implements LoaderManager.LoaderCallbacks<List<Movie>>, MovieListAdapter.OnMovieClickListener {
     public static final String EXTRA_KEY_MOVIE = "movie";
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int MOVIE_LIST_LOADER_ID = 42;
+
+    private static final int MOVIE_LIST_WEB_LOADER_ID = 42;
     private static int sPosition = RecyclerView.NO_POSITION;
+
     RecyclerView mRecyclerView;
     private List<Movie> mMovieList = new ArrayList<>();
     private MovieListAdapter mMovieListAdapter;
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar myToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(myToolbar);
 
-        getSupportLoaderManager().initLoader(MOVIE_LIST_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(MOVIE_LIST_WEB_LOADER_ID, null, this);
     }
 
     @Override
@@ -79,29 +81,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
+    public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
         return new MovieLoader(this);
     }
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String jsonString) {
-        if (jsonString == null) {
+    public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> movieList) {
+        if (movieList == null || movieList.isEmpty()) {
             findViewById(R.id.tv_empty_view).setVisibility(View.VISIBLE);
             return;
         }
-        try {
-            mMovieList = TmdbJsonUtils.parseMovieListFrom(jsonString);
-        } catch (JSONException e) {
-            Log.d(TAG, e.getMessage());
-            e.printStackTrace();
-        }
-        if (mMovieList != null) {
-            updateUi();
-        }
+        mMovieList = movieList;
+        updateUi();
     }
 
     @Override
-    public void onLoaderReset(Loader<String> loader) {
+    public void onLoaderReset(Loader<List<Movie>> loader) {
         mMovieListAdapter.setData(null);
     }
 
@@ -120,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         startActivity(startMovieDetailIntent);
     }
 
-    static class MovieLoader extends AsyncTaskLoader<String> {
+    static class MovieLoader extends AsyncTaskLoader<List<Movie>> {
         MovieLoader(Context context) {
             super(context);
         }
@@ -132,7 +127,7 @@ public class MainActivity extends AppCompatActivity
 
         @Nullable
         @Override
-        public String loadInBackground() {
+        public List<Movie> loadInBackground() {
             URL url = NetworkUtils.getMovieListQueryUrl(getContext());
             String jsonString = null;
             try {
@@ -141,7 +136,22 @@ public class MainActivity extends AppCompatActivity
                 Log.d(TAG, e.getMessage());
                 e.printStackTrace();
             }
-            return jsonString;
+
+            if (jsonString == null) {
+                return null;
+            }
+
+            List<Movie> movieList = null;
+            try {
+                movieList = TmdbJsonUtils.parseMovieListFrom(jsonString);
+            } catch (JSONException e) {
+                Log.d(TAG, e.getMessage());
+                e.printStackTrace();
+            }
+            if (movieList == null) {
+                return null;
+            }
+            return movieList;
         }
     }
 }
