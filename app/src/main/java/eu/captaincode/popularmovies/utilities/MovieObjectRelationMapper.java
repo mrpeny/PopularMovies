@@ -1,16 +1,26 @@
 package eu.captaincode.popularmovies.utilities;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.support.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import eu.captaincode.popularmovies.data.MovieContract.MovieEntry;
 import eu.captaincode.popularmovies.model.Movie;
 
 /**
- * Handles ContentValues Movie objects conversion.
+ * Handles Movie conversions represented as {@link ContentValues}, {@link Cursor}, or POJO's.
  */
 
 public class MovieObjectRelationMapper {
-
+    /**
+     * Converts {@link Movie} POJO to {@link ContentValues}.
+     *
+     * @param movie the object to convert to
+     * @return the converted Movie object
+     */
     public static ContentValues toContentValues(Movie movie) {
         ContentValues contentValues = new ContentValues();
 
@@ -26,18 +36,44 @@ public class MovieObjectRelationMapper {
         return contentValues;
     }
 
-    public static Movie toMovie(ContentValues contentValues) {
-        Movie movie = new Movie();
+    /**
+     * Converts {@link Cursor} to a List of {@link Movie} POJO's.
+     *
+     * @param cursor the cursor containing a list of Movie objects
+     * @return the list of {@link Movie} objects
+     */
+    public static List<Movie> toMovieList(@NonNull Cursor cursor) {
+        int numRows = cursor.getCount();
+        if (numRows == 0) {
+            return new ArrayList<>(0);
+        }
+        List<Movie> movieList = new ArrayList<>(numRows);
 
-        movie.setId(contentValues.getAsInteger(MovieEntry._ID));
-        movie.setTitle(contentValues.getAsString(MovieEntry.COLUMN_TITLE));
-        movie.setPosterPath(contentValues.getAsString(MovieEntry.COLUMN_POSTER_PATH));
-        movie.setOverView(contentValues.getAsString(MovieEntry.COLUMN_OVERVIEW));
-        movie.setVoteAverage(contentValues.getAsLong(MovieEntry.COLUMN_VOTE_AVERAGE));
-        movie.setBackdropPath(contentValues.getAsString(MovieEntry.COLUMN_BACKDROP_PATH));
-        movie.setDate(contentValues.getAsString(MovieEntry.COLUMN_DATE));
-        movie.setFavorite(contentValues.getAsBoolean(MovieEntry.COLUMN_FAVORITE));
+        int tmdbIdIndex = cursor.getColumnIndex(MovieEntry.COLUMN_ID_TMDB);
+        int titleIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
+        int posterPathIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH);
+        int overviewIndex = cursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW);
+        int voteAverageIndex = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE);
+        int backdropPathIndex = cursor.getColumnIndex(MovieEntry.COLUMN_BACKDROP_PATH);
+        int dateIndex = cursor.getColumnIndex(MovieEntry.COLUMN_DATE);
+        int favoriteIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
 
-        return movie;
+        cursor.moveToFirst();
+        do {
+            Movie movie = new Movie();
+
+            movie.setId(cursor.getInt(tmdbIdIndex));
+            movie.setTitle(cursor.getString(titleIndex));
+            movie.setPosterPath(cursor.getString(posterPathIndex));
+            movie.setOverView(cursor.getString(overviewIndex));
+            movie.setVoteAverage(cursor.getLong(voteAverageIndex));
+            movie.setBackdropPath(cursor.getString(backdropPathIndex));
+            movie.setDate(cursor.getString(dateIndex));
+            movie.setFavorite(cursor.getInt(favoriteIndex) == 1);
+
+            movieList.add(movie);
+        } while (cursor.moveToNext());
+
+        return movieList;
     }
 }

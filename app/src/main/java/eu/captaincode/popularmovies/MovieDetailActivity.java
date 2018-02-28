@@ -1,5 +1,6 @@
 package eu.captaincode.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -29,6 +30,7 @@ import java.util.Locale;
 import eu.captaincode.popularmovies.adapters.VideoListAdapter;
 import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
+import eu.captaincode.popularmovies.handler.FavoritesAsyncQueryHandler;
 import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.model.Video;
 import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
@@ -41,19 +43,24 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements FavoritesAsyncQueryHandler.AsyncQueryListener {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
+
     private static final int PERCENT_MULTIPLIER_VOTE_AVERAGE = 10;
-    VideoListAdapter videoListAdapter;
-    private ActivityMovieDetailBinding movieDetailBinding;
+    private static final String VIDEO_TYPE_TRAILER = "Trailer";
+
     private Movie mMovie;
     private List<Video> mVideoList = new ArrayList<>();
+
+    private VideoListAdapter mVideoListAdapter;
+    private FavoritesAsyncQueryHandler mQueryHandler;
+    private ActivityMovieDetailBinding mMovieDetailBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        movieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
+        mMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
 
         Toolbar toolbar = findViewById(R.id.toolbar_movie_detail);
         setSupportActionBar(toolbar);
@@ -67,32 +74,56 @@ public class MovieDetailActivity extends AppCompatActivity {
             mMovie = startingIntent.getParcelableExtra(MainActivity.EXTRA_KEY_MOVIE);
         }
         if (mMovie == null) {
-            Log.d(TAG, "No movie object passed");
+            Log.d(TAG, "No movie object passed, nothing to show.");
             return;
         }
+        // Object used to perform CRUD operations on the DB
+        mQueryHandler = new FavoritesAsyncQueryHandler(getContentResolver(), this);
 
-        videoListAdapter = new VideoListAdapter(this, mVideoList);
-        movieDetailBinding.rvVideosMovieDetail.setAdapter(videoListAdapter);
+        mVideoListAdapter = new VideoListAdapter(this, mVideoList);
+        mMovieDetailBinding.rvVideosMovieDetail.setAdapter(mVideoListAdapter);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL, false);
-        movieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
+        mMovieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
 
         showMovieDetails();
     }
 
     private void showMovieDetails() {
-        movieDetailBinding.setMovie(mMovie);
+        mMovieDetailBinding.setMovie(mMovie);
+        showBackdropImage();
+        showPosterImage();
+        showReleaseDate();
+        mMovieDetailBinding.tvVoteAverageNumberMovieDetail.setText(String.valueOf(mMovie
+                .getVoteAverage()));
+        mMovieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
+                PERCENT_MULTIPLIER_VOTE_AVERAGE));
+        // Run a background query to check if mMovie is a part of favorites. Result evaluation in
+        // onQueryComplete(Cursor cursor) callback
+        mQueryHandler.startQuery(0, null, MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry._ID},
+                MovieContract.MovieEntry.COLUMN_ID_TMDB + " = ?",
+                new String[]{String.valueOf(mMovie.getId())},
+                null);
+        showVideos();
+    }
 
+    private void showBackdropImage() {
         Uri backdropUri = NetworkUtils.getBackdropImageUriFor(this, mMovie.getBackdropPath());
-        Picasso.with(this).load(backdropUri).into(movieDetailBinding.ivMovieDetailBackdrop);
-        movieDetailBinding.ivMovieDetailBackdrop.setContentDescription(getString(R.string
+        Picasso.with(this).load(backdropUri).placeholder(R.drawable.poster_placeholder)
+                .into(mMovieDetailBinding.ivMovieDetailBackdrop);
+        mMovieDetailBinding.ivMovieDetailBackdrop.setContentDescription(getString(R.string
                 .main_backdrop_iv_content_description, mMovie.getTitle()));
+    }
 
+    private void showPosterImage() {
         Uri posterUri = NetworkUtils.getPosterImageUriFor(this, mMovie.getPosterPath());
-        Picasso.with(this).load(posterUri).into(movieDetailBinding.ivPosterImageMovieDetail);
-        movieDetailBinding.ivPosterImageMovieDetail.setContentDescription(getString(R.string
+        Picasso.with(this).load(posterUri).into(mMovieDetailBinding.ivPosterImageMovieDetail);
+        mMovieDetailBinding.ivPosterImageMovieDetail.setContentDescription(getString(R.string
                 .main_poster_iv_content_description, mMovie.getTitle()));
+    }
 
+    private void showReleaseDate() {
         String releaseDateString = mMovie.getDate();
         try {
             Date releaseDate = new SimpleDateFormat(TmdbJsonUtils.DATE_FORMAT_TMDB, Locale
@@ -101,30 +132,22 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .format(releaseDate);
             String labeledReleaseDate = getString(R.string.release_date_movie_detail,
                     localeReleaseDate);
-            movieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
+            mMovieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
         } catch (ParseException e) {
             String labeledReleaseDate = getString(R.string.release_date_movie_detail,
                     releaseDateString);
-            movieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
+            mMovieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
             e.printStackTrace();
         }
-
-        movieDetailBinding.tvVoteAverageNumberMovieDetail.setText(String.valueOf(mMovie
-                .getVoteAverage()));
-
-        movieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
-                PERCENT_MULTIPLIER_VOTE_AVERAGE));
-
-        showVideos();
     }
 
     private void showVideos() {
-        final Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetworkUtils.BASE_URL_TMDB)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
-        final Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
+        NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
+        Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
                 NetworkUtils.getSystemLanguageTag());
 
         call.enqueue(new Callback<VideoListResponse>() {
@@ -138,10 +161,10 @@ public class MovieDetailActivity extends AppCompatActivity {
 
                         for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
                             Video video = iterator.next();
-                            if (!video.getType().equals("Trailer")) {
+                            if (!video.getType().equals(VIDEO_TYPE_TRAILER)) {
                                 iterator.remove();
                             }
-                            videoListAdapter.setData(videoList);
+                            mVideoListAdapter.setData(videoList);
                         }
                     } else {
                         Log.d(TAG, "No videos belong to this Movie");
@@ -159,26 +182,46 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     public void onFabClick(View view) {
-        String changeId = "0";
         if (!mMovie.isFavorite()) {
             mMovie.setFavorite(true);
-            Uri movieUri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, MovieObjectRelationMapper.toContentValues(mMovie));
-            Log.d(TAG, movieUri.toString());
-            changeId = movieUri.getLastPathSegment();
+            saveMovieToDatabase();
         } else if (mMovie.isFavorite()) {
             mMovie.setFavorite(false);
-            getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?", new String[]{String.valueOf(mMovie.getId())});
+            deleteMovieFromDatabase();
         }
-        Cursor cursor = getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, MovieContract.MovieEntry._ID + "= ?", new String[]{changeId}, null);
+    }
 
-        if (cursor.moveToFirst()) {
-            int index = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVORITE);
-            int favorite = cursor.getInt(index);
-            Toast.makeText(this, "favorite: " + favorite, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Cursor empty", Toast.LENGTH_SHORT).show();
+    private void deleteMovieFromDatabase() {
+        String selection = MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?";
+        String[] selectionArgs = {String.valueOf(mMovie.getId())};
+        mQueryHandler.startDelete(1, null, MovieContract.MovieEntry.CONTENT_URI, selection,
+                selectionArgs);
+    }
+
+    private void saveMovieToDatabase() {
+        ContentValues movieInContentValues = MovieObjectRelationMapper.toContentValues(mMovie);
+        mQueryHandler.startInsert(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                movieInContentValues);
+    }
+
+    // Callbacks methods invoked by completion of CRUD operations
+    @Override
+    public void onQueryComplete(Cursor cursor) {
+        if (cursor.getCount() > 0) {
+            mMovie.setFavorite(true);
+            mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
         }
+    }
 
-        cursor.close();
+    @Override
+    public void onInsertComplete() {
+        mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
+        Toast.makeText(this, mMovie.getTitle() + " is marked as favorite", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeleteComplete() {
+        mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_false_24dp);
+        Toast.makeText(this, mMovie.getTitle() + " is deleted from favorites", Toast.LENGTH_SHORT).show();
     }
 }

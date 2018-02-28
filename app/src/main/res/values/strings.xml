@@ -16,8 +16,10 @@
     <string name="preference_key_sort_by" translatable="false">sort-by</string>
     <string name="preference_option_sort_by_popular_label">Most popular</string>
     <string name="preference_option_sort_by_top_rated_label">Top rated</string>
+    <string name="preference_option_sort_by_favorites_label">Favorites</string>
     <string name="preference_option_sort_by_popular_value" translatable="false">most-popular</string>
     <string name="preference_option_sort_by_top_rated_value" translatable="false">top-rated</string>
+    <string name="preference_option_sort_by_favorites_value" translatable="false">favorites</string>
 
     <!-- MovieDetailActivity texts -->
     <string name="release_date_movie_detail">Release date:
