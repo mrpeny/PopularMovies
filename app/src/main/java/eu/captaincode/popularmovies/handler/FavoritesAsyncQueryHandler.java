@@ -2,6 +2,7 @@ package eu.captaincode.popularmovies.handler;
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.database.Cursor;
 import android.net.Uri;
 
 /**
@@ -26,8 +27,19 @@ public class FavoritesAsyncQueryHandler extends AsyncQueryHandler {
         mListener.onDeleteComplete();
     }
 
+    @Override
+    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+        mListener.onQueryComplete(cursor);
+    }
+
+    /**
+     * Provides callback methods indicating the completion of CRUD operations.
+     */
     public interface AsyncQueryListener {
         void onInsertComplete();
+
         void onDeleteComplete();
+
+        void onQueryComplete(Cursor cursor);
     }
 }

@@ -1,6 +1,8 @@
 package eu.captaincode.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
     private static final int PERCENT_MULTIPLIER_VOTE_AVERAGE = 10;
+    private static final String VIDEO_TYPE_TRAILER = "Trailer";
 
     private Movie mMovie;
     private List<Video> mVideoList = new ArrayList<>();
@@ -71,9 +74,11 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
             mMovie = startingIntent.getParcelableExtra(MainActivity.EXTRA_KEY_MOVIE);
         }
         if (mMovie == null) {
-            Log.d(TAG, "No movie object passed");
+            Log.d(TAG, "No movie object passed, nothing to show.");
             return;
         }
+        // Object used to perform CRUD operations on the DB
+        mQueryHandler = new FavoritesAsyncQueryHandler(getContentResolver(), this);
 
         mVideoListAdapter = new VideoListAdapter(this, mVideoList);
         mMovieDetailBinding.rvVideosMovieDetail.setAdapter(mVideoListAdapter);
@@ -81,24 +86,44 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 LinearLayoutManager.HORIZONTAL, false);
         mMovieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
 
-        mQueryHandler = new FavoritesAsyncQueryHandler(getContentResolver(), this);
-
         showMovieDetails();
     }
 
     private void showMovieDetails() {
         mMovieDetailBinding.setMovie(mMovie);
+        showBackdropImage();
+        showPosterImage();
+        showReleaseDate();
+        mMovieDetailBinding.tvVoteAverageNumberMovieDetail.setText(String.valueOf(mMovie
+                .getVoteAverage()));
+        mMovieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
+                PERCENT_MULTIPLIER_VOTE_AVERAGE));
+        // Run a background query to check if mMovie is a part of favorites. Result evaluation in
+        // onQueryComplete(Cursor cursor) callback
+        mQueryHandler.startQuery(0, null, MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry._ID},
+                MovieContract.MovieEntry.COLUMN_ID_TMDB + " = ?",
+                new String[]{String.valueOf(mMovie.getId())},
+                null);
+        showVideos();
+    }
 
+    private void showBackdropImage() {
         Uri backdropUri = NetworkUtils.getBackdropImageUriFor(this, mMovie.getBackdropPath());
-        Picasso.with(this).load(backdropUri).into(mMovieDetailBinding.ivMovieDetailBackdrop);
+        Picasso.with(this).load(backdropUri).placeholder(R.drawable.poster_placeholder)
+                .into(mMovieDetailBinding.ivMovieDetailBackdrop);
         mMovieDetailBinding.ivMovieDetailBackdrop.setContentDescription(getString(R.string
                 .main_backdrop_iv_content_description, mMovie.getTitle()));
+    }
 
+    private void showPosterImage() {
         Uri posterUri = NetworkUtils.getPosterImageUriFor(this, mMovie.getPosterPath());
         Picasso.with(this).load(posterUri).into(mMovieDetailBinding.ivPosterImageMovieDetail);
         mMovieDetailBinding.ivPosterImageMovieDetail.setContentDescription(getString(R.string
                 .main_poster_iv_content_description, mMovie.getTitle()));
+    }
 
+    private void showReleaseDate() {
         String releaseDateString = mMovie.getDate();
         try {
             Date releaseDate = new SimpleDateFormat(TmdbJsonUtils.DATE_FORMAT_TMDB, Locale
@@ -114,28 +139,15 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
             mMovieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
             e.printStackTrace();
         }
-
-        mMovieDetailBinding.tvVoteAverageNumberMovieDetail.setText(String.valueOf(mMovie
-                .getVoteAverage()));
-
-        mMovieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
-                PERCENT_MULTIPLIER_VOTE_AVERAGE));
-
-        // TODO: Set movie as favorite if it exist the favorite list DB table
-        if (mMovie.isFavorite()) {
-            mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
-        }
-
-        showVideos();
     }
 
     private void showVideos() {
-        final Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetworkUtils.BASE_URL_TMDB)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        final NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
-        final Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
+        NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
+        Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
                 NetworkUtils.getSystemLanguageTag());
 
         call.enqueue(new Callback<VideoListResponse>() {
@@ -149,7 +161,7 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
 
                         for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
                             Video video = iterator.next();
-                            if (!video.getType().equals("Trailer")) {
+                            if (!video.getType().equals(VIDEO_TYPE_TRAILER)) {
                                 iterator.remove();
                             }
                             mVideoListAdapter.setData(videoList);
@@ -180,15 +192,25 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
     }
 
     private void deleteMovieFromDatabase() {
-        mQueryHandler.startDelete(1, null, MovieContract.MovieEntry.CONTENT_URI,
-                MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?",
-                new String[]{String.valueOf(mMovie.getId())});
+        String selection = MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?";
+        String[] selectionArgs = {String.valueOf(mMovie.getId())};
+        mQueryHandler.startDelete(1, null, MovieContract.MovieEntry.CONTENT_URI, selection,
+                selectionArgs);
     }
 
     private void saveMovieToDatabase() {
-        mQueryHandler.startInsert(1, null,
-                MovieContract.MovieEntry.CONTENT_URI,
-                MovieObjectRelationMapper.toContentValues(mMovie));
+        ContentValues movieInContentValues = MovieObjectRelationMapper.toContentValues(mMovie);
+        mQueryHandler.startInsert(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                movieInContentValues);
+    }
+
+    // Callbacks methods invoked by completion of CRUD operations
+    @Override
+    public void onQueryComplete(Cursor cursor) {
+        if (cursor.getCount() > 0) {
+            mMovie.setFavorite(true);
+            mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
+        }
     }
 
     @Override
