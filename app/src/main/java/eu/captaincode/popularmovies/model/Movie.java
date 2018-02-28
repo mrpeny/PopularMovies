@@ -49,6 +49,7 @@ public class Movie implements Parcelable {
         voteAverage = in.readDouble();
         backdropPath = in.readString();
         date = in.readString();
+        favorite = in.readByte() == 1;
     }
 
     @Override
@@ -65,6 +66,7 @@ public class Movie implements Parcelable {
         dest.writeDouble(voteAverage);
         dest.writeString(backdropPath);
         dest.writeString(date);
+        dest.writeByte((byte) (favorite ? 1 : 0));
     }
 
     public int getId() {
