@@ -3,7 +3,9 @@ package eu.captaincode.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -25,17 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.captaincode.popularmovies.adapters.MovieListAdapter;
+import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.model.Movie;
+import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<Movie>>, MovieListAdapter.OnMovieClickListener {
+        implements LoaderManager.LoaderCallbacks<List<Movie>>,
+        MovieListAdapter.OnMovieClickListener {
     public static final String EXTRA_KEY_MOVIE = "movie";
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int MOVIE_LIST_WEB_LOADER_ID = 42;
+    private static final int MOVIE_LIST_CURSOR_LOADER_ID = 28;
     private static int sPosition = RecyclerView.NO_POSITION;
 
     RecyclerView mRecyclerView;
@@ -57,7 +63,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar myToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(myToolbar);
 
-        getSupportLoaderManager().initLoader(MOVIE_LIST_WEB_LOADER_ID, null, this);
+        String sortBy = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                getString(R.string.preference_key_sort_by),
+                getString(R.string.preference_option_sort_by_popular_value));
+        if (sortBy.equals(getString(R.string.preference_option_sort_by_favorites_value))) {
+            getSupportLoaderManager().initLoader(MOVIE_LIST_CURSOR_LOADER_ID, null, this);
+        } else {
+            getSupportLoaderManager().initLoader(MOVIE_LIST_WEB_LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -76,13 +89,19 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, MovieListSettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
-        return new MovieLoader(this);
+    public Loader<List<Movie>> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+            case MOVIE_LIST_WEB_LOADER_ID:
+                return new MovieWebLoader(this);
+            case MOVIE_LIST_CURSOR_LOADER_ID:
+                return new MovieCursorLoader(this);
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+        }
     }
 
     @Override
@@ -115,8 +134,8 @@ public class MainActivity extends AppCompatActivity
         startActivity(startMovieDetailIntent);
     }
 
-    static class MovieLoader extends AsyncTaskLoader<List<Movie>> {
-        MovieLoader(Context context) {
+    static class MovieWebLoader extends AsyncTaskLoader<List<Movie>> {
+        MovieWebLoader(Context context) {
             super(context);
         }
 
@@ -151,6 +170,36 @@ public class MainActivity extends AppCompatActivity
             if (movieList == null) {
                 return null;
             }
+            return movieList;
+        }
+    }
+
+    static class MovieCursorLoader extends AsyncTaskLoader<List<Movie>> {
+        MovieCursorLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onStartLoading() {
+            forceLoad();
+        }
+
+        @Nullable
+        @Override
+        public List<Movie> loadInBackground() {
+            Cursor cursor = getContext().getContentResolver().query(
+                    MovieContract.MovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+
+            if (cursor == null) {
+                return null;
+            }
+
+            List<Movie> movieList = MovieObjectRelationMapper.toMovieList(cursor);
+            cursor.close();
             return movieList;
         }
     }
