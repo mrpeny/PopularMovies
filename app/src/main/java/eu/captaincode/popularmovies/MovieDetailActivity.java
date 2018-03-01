@@ -27,14 +27,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import eu.captaincode.popularmovies.adapters.ReviewListAdapter;
 import eu.captaincode.popularmovies.adapters.VideoListAdapter;
 import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.handler.FavoritesAsyncQueryHandler;
 import eu.captaincode.popularmovies.model.Movie;
+import eu.captaincode.popularmovies.model.Review;
 import eu.captaincode.popularmovies.model.Video;
 import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
+import eu.captaincode.popularmovies.utilities.ReviewListResponse;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 import eu.captaincode.popularmovies.utilities.VideoListResponse;
 import retrofit2.Call;
@@ -51,8 +54,10 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
 
     private Movie mMovie;
     private List<Video> mVideoList = new ArrayList<>();
+    private List<Review> mReviewList = new ArrayList<>();
 
     private VideoListAdapter mVideoListAdapter;
+    private ReviewListAdapter mReviewListAdapter;
     private FavoritesAsyncQueryHandler mQueryHandler;
     private ActivityMovieDetailBinding mMovieDetailBinding;
 
@@ -86,6 +91,12 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 LinearLayoutManager.HORIZONTAL, false);
         mMovieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
 
+        mReviewListAdapter = new ReviewListAdapter(this, mReviewList);
+        mMovieDetailBinding.rvReviewsMovieDetail.setAdapter(mReviewListAdapter);
+        RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+        mMovieDetailBinding.rvReviewsMovieDetail.setLayoutManager(verticalLayoutManager);
+
         showMovieDetails();
     }
 
@@ -106,6 +117,7 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 new String[]{String.valueOf(mMovie.getId())},
                 null);
         showVideos();
+        showReviews();
     }
 
     private void showBackdropImage() {
@@ -176,6 +188,40 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
 
             @Override
             public void onFailure(@NonNull Call<VideoListResponse> call, @NonNull Throwable t) {
+                Log.d(TAG, t.getMessage());
+            }
+        });
+    }
+
+    private void showReviews() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(NetworkUtils.BASE_URL_TMDB)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
+        Call<ReviewListResponse> call = service.getReviewsForMovie(mMovie.getId(),
+                NetworkUtils.getSystemLanguageTag());
+
+        call.enqueue(new Callback<ReviewListResponse>() {
+            @Override
+            public void onResponse(@NonNull final Call<ReviewListResponse> call,
+                                   @NonNull final Response<ReviewListResponse> response) {
+                if (response.isSuccessful()) {
+                    ReviewListResponse reviewListResponse = response.body();
+                    if (reviewListResponse != null) {
+                        List<Review> reviewList = reviewListResponse.getmReviewList();
+                        mReviewListAdapter.setData(reviewList);
+
+                    } else {
+                        Log.d(TAG, "No videos belong to this Movie");
+                    }
+                } else {
+                    Log.d(TAG, "Failed to download movie videos");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ReviewListResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, t.getMessage());
             }
         });

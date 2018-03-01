@@ -153,6 +153,24 @@
 
                 </android.support.v7.widget.RecyclerView>
 
+                <View
+                    android:layout_marginTop="@dimen/movie_detail_poster_padding"
+                    android:layout_marginBottom="@dimen/movie_detail_poster_padding"
+                    android:id="@+id/divider_movie_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintTop_toBottomOf="@id/rv_videos_movie_detail"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_reviews_movie_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/padding_bottom_rv"
+                    app:layout_constraintTop_toBottomOf="@id/divider_movie_detail">
+
+                </android.support.v7.widget.RecyclerView>
+
             </android.support.constraint.ConstraintLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
