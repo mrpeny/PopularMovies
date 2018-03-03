@@ -2,15 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/padding_general"
+    android:orientation="horizontal">
 
     <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/iv_video_list_item_thumbnail"
         android:layout_width="wrap_content"
-        android:layout_height="120dp"
+        android:layout_height="@dimen/video_list_item_image_height"
         android:adjustViewBounds="true"
-        android:layout_marginStart="@dimen/video_thumbnail_recycler_margin"
-        android:layout_marginEnd="@dimen/video_thumbnail_recycler_margin"
         android:contentDescription="@string/movie_detail_video_thumbnail_image"
         tools:src="@drawable/poster_placeholder" />
+
+    <TextView
+        android:id="@+id/tv_video_list_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|top"
+        android:layout_marginStart="@dimen/video_thumbnail_recycler_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="Official trailer" />
 </LinearLayout>

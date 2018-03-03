@@ -6,13 +6,10 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -20,51 +17,25 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import eu.captaincode.popularmovies.adapters.CategoryFragmentAdapter;
-import eu.captaincode.popularmovies.adapters.VideoListAdapter;
 import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
 import eu.captaincode.popularmovies.handler.FavoritesAsyncQueryHandler;
 import eu.captaincode.popularmovies.model.Movie;
-import eu.captaincode.popularmovies.model.Video;
 import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
-import eu.captaincode.popularmovies.utilities.VideoListResponse;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailActivity extends AppCompatActivity implements FavoritesAsyncQueryHandler.AsyncQueryListener {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
-    private static final String VIDEO_TYPE_TRAILER = "Trailer";
-
     private Movie mMovie;
-    private List<Video> mVideoList = new ArrayList<>();
-    private CategoryFragmentAdapter categoryFragmentAdapter;
-
-    private VideoListAdapter mVideoListAdapter;
     private FavoritesAsyncQueryHandler mQueryHandler;
     private ActivityMovieDetailBinding mMovieDetailBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mMovieDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie_detail);
-
-        Toolbar toolbar = findViewById(R.id.toolbar_movie_detail);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
         Intent startingIntent = getIntent();
         if (startingIntent != null) {
@@ -74,31 +45,31 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
             Log.d(TAG, "No movie object passed, nothing to show.");
             return;
         }
+
+        Toolbar toolbar = findViewById(R.id.toolbar_movie_detail);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         // Object used to perform CRUD operations on the DB
         mQueryHandler = new FavoritesAsyncQueryHandler(getContentResolver(), this);
 
-        categoryFragmentAdapter = new CategoryFragmentAdapter(getSupportFragmentManager(), this,
-                mMovie);
-
+        CategoryFragmentAdapter categoryFragmentAdapter = new CategoryFragmentAdapter(
+                getSupportFragmentManager(), this, mMovie);
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(categoryFragmentAdapter);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.setTabsFromPagerAdapter(categoryFragmentAdapter);
         tabLayout.setupWithViewPager(viewPager);
-
-        mVideoListAdapter = new VideoListAdapter(this, mVideoList);
-        mMovieDetailBinding.rvVideosMovieDetail.setAdapter(mVideoListAdapter);
-        RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this,
-                LinearLayoutManager.HORIZONTAL, false);
-        mMovieDetailBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
 
         showMovieDetails();
     }
 
     private void showMovieDetails() {
+        setTitle(mMovie.getTitle());
         showBackdropImage();
-        showIfFavorite();
-        showVideos();
+        checkIfFavorite();
     }
 
     private void showBackdropImage() {
@@ -109,9 +80,11 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 .main_backdrop_iv_content_description, mMovie.getTitle()));
     }
 
-    private void showIfFavorite() {
-        // Run a background query to check if mMovie is a part of favorites. Result evaluation in
-        // onQueryComplete(Cursor cursor) callback
+    /*
+     * Run a background query to check if mMovie is part of favorites. The result is evaluated
+     * onQueryComplete(Cursor cursor) callback method below.
+     */
+    private void checkIfFavorite() {
         mQueryHandler.startQuery(0, null, MovieContract.MovieEntry.CONTENT_URI,
                 new String[]{MovieContract.MovieEntry._ID},
                 MovieContract.MovieEntry.COLUMN_ID_TMDB + " = ?",
@@ -119,44 +92,12 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 null);
     }
 
-    private void showVideos() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(NetworkUtils.BASE_URL_TMDB)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        NetworkUtils.TmdbServiceApi service = retrofit.create(NetworkUtils.TmdbServiceApi.class);
-        Call<VideoListResponse> call = service.getVideosForMovie(mMovie.getId(),
-                NetworkUtils.getSystemLanguageTag());
-
-        call.enqueue(new Callback<VideoListResponse>() {
-            @Override
-            public void onResponse(@NonNull final Call<VideoListResponse> call,
-                                   @NonNull final Response<VideoListResponse> response) {
-                if (response.isSuccessful()) {
-                    VideoListResponse videoListResponse = response.body();
-                    if (videoListResponse != null) {
-                        List<Video> videoList = videoListResponse.getVideoList();
-
-                        for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
-                            Video video = iterator.next();
-                            if (!video.getType().equals(VIDEO_TYPE_TRAILER)) {
-                                iterator.remove();
-                            }
-                            mVideoListAdapter.setData(videoList);
-                        }
-                    } else {
-                        Log.d(TAG, "No videos belong to this Movie");
-                    }
-                } else {
-                    Log.d(TAG, "Failed to download movie videos");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<VideoListResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, t.getMessage());
-            }
-        });
+    @Override
+    public void onQueryComplete(Cursor cursor) {
+        if (cursor.getCount() > 0) {
+            mMovie.setFavorite(true);
+            mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
+        }
     }
 
     public void onFabClick(View view) {
@@ -169,6 +110,12 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
         }
     }
 
+    private void saveMovieToDatabase() {
+        ContentValues movieInContentValues = MovieObjectRelationMapper.toContentValues(mMovie);
+        mQueryHandler.startInsert(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                movieInContentValues);
+    }
+
     private void deleteMovieFromDatabase() {
         String selection = MovieContract.MovieEntry.COLUMN_ID_TMDB + "= ?";
         String[] selectionArgs = {String.valueOf(mMovie.getId())};
@@ -176,21 +123,7 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 selectionArgs);
     }
 
-    private void saveMovieToDatabase() {
-        ContentValues movieInContentValues = MovieObjectRelationMapper.toContentValues(mMovie);
-        mQueryHandler.startInsert(1, null, MovieContract.MovieEntry.CONTENT_URI,
-                movieInContentValues);
-    }
-
-    // Callbacks methods invoked by completion of CRUD operations
-    @Override
-    public void onQueryComplete(Cursor cursor) {
-        if (cursor.getCount() > 0) {
-            mMovie.setFavorite(true);
-            mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
-        }
-    }
-
+    // Callback methods invoked by mQueryHandler on completion of save and delete movie method
     @Override
     public void onInsertComplete() {
         mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);

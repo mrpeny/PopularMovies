@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import eu.captaincode.popularmovies.OverviewFragment;
 import eu.captaincode.popularmovies.R;
+import eu.captaincode.popularmovies.ReviewsFragment;
+import eu.captaincode.popularmovies.VideosFragment;
 import eu.captaincode.popularmovies.model.Movie;
 
 /**
@@ -41,16 +43,14 @@ public class CategoryFragmentAdapter extends FragmentPagerAdapter {
                 overviewFragment.setArguments(args);
                 return overviewFragment;
             case 1:
-                OverviewFragment trailersFragment = new OverviewFragment();
-                trailersFragment.setArguments(args);
-                return trailersFragment;
+                VideosFragment videosFragment = new VideosFragment();
+                videosFragment.setArguments(args);
+                return videosFragment;
             case 2:
-                OverviewFragment reviewsFragment = new OverviewFragment();
-                args.putParcelable(KEY_MOVIE, mMovie);
+                ReviewsFragment reviewsFragment = new ReviewsFragment();
                 reviewsFragment.setArguments(args);
                 return reviewsFragment;
         }
-
         return null;
     }
 

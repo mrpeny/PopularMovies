@@ -26,17 +26,15 @@ import eu.captaincode.popularmovies.utilities.NetworkUtils;
 import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 
 /**
- * Holds general information and overview about a movie.
+ * Holds general information and overview for a movie.
  */
 
 public class OverviewFragment extends Fragment {
     private static final int PERCENT_MULTIPLIER_VOTE_AVERAGE = 10;
     private static final String TAG = OverviewFragment.class.getSimpleName();
 
-    private FragmentOverviewBinding fragmentOverviewBinding;
-
     private Movie mMovie;
-
+    private FragmentOverviewBinding fragmentOverviewBinding;
 
     @Nullable
     @Override

@@ -12,4 +12,7 @@
     <dimen name="line_margin_movie_detail">8dp</dimen>
     <dimen name="progress_bar_width_height">150dp</dimen>
     <dimen name="video_thumbnail_recycler_margin">8dp</dimen>
+    <dimen name="padding_general">16dp</dimen>
+    <dimen name="fragment_padding">8dp</dimen>
+    <dimen name="video_list_item_image_height">120dp</dimen>
 </resources>

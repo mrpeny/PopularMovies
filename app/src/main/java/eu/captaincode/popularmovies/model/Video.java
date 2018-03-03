@@ -16,6 +16,8 @@ public final class Video {
 
     private String site;
 
+    private String name;
+
     private String type;
 
     public String getId() {
@@ -28,6 +30,10 @@ public final class Video {
 
     public String getSite() {
         return site;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getType() {
