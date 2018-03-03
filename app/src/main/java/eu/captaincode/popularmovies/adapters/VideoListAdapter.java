@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -44,6 +45,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         holder.setVideoId(videoId);
         Uri videoThumbnailUri = NetworkUtils.getYouTubeThumbnailImageFor(videoId);
         Picasso.with(mContext).load(videoThumbnailUri).into(holder.thumbNailImageView);
+
+        holder.nameTextView.setText(mVideoList.get(position).getName());
     }
 
     @Override
@@ -62,12 +65,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
     class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         static final String VND_YOUTUBE = "vnd.youtube:";
-        final ImageView thumbNailImageView;
+        private ImageView thumbNailImageView;
         private String mVideoId;
+        private TextView nameTextView;
 
         VideoViewHolder(View itemView) {
             super(itemView);
             thumbNailImageView = itemView.findViewById(R.id.iv_video_list_item_thumbnail);
+            nameTextView = itemView.findViewById(R.id.tv_video_list_item_name);
             itemView.setOnClickListener(this);
         }
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_reviews_movie_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:padding="@dimen/fragment_padding" />
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_empty_view_reviews_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawablePadding="@dimen/padding_bottom_rv"
+                android:drawableTop="@drawable/image_empty"
+                android:gravity="center"
+                android:padding="@dimen/padding_general"
+                android:text="@string/fragment_reviews_no_reviews"
+                android:visibility="gone" />
+        </android.support.v4.widget.NestedScrollView>
+    </FrameLayout>
+</layout>

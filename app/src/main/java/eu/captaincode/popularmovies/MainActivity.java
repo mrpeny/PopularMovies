@@ -3,6 +3,7 @@ package eu.captaincode.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -63,9 +64,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar myToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(myToolbar);
 
+        initLoaderByPreference();
+    }
+
+    private void initLoaderByPreference() {
         String sortBy = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 getString(R.string.preference_key_sort_by),
                 getString(R.string.preference_option_sort_by_popular_value));
+
         if (sortBy.equals(getString(R.string.preference_option_sort_by_favorites_value))) {
             getSupportLoaderManager().initLoader(MOVIE_LIST_CURSOR_LOADER_ID, null, this);
         } else {
@@ -75,21 +81,49 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // TODO: Change menu item to spinner
-        // {@see http://www.viralandroid.com/2016/03/how-to-add-spinner-dropdown-list-to-android-actionbar-toolbar.html}
-        // {@see http://tomazwang.logdown.com/posts/1016846}
         getMenuInflater().inflate(R.menu.movie_list, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences.Editor sharedPreferencesEditor =
+                PreferenceManager.getDefaultSharedPreferences(this).edit();
+
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, MovieListSettingsActivity.class));
+        if (id == R.id.menu_sort_popular) {
+            sharedPreferencesEditor.putString(getString(R.string.preference_key_sort_by),
+                    getString(R.string.preference_option_sort_by_popular_value));
+            sharedPreferencesEditor.apply();
+            restartLoaderByPreference();
             return true;
+        } else if (id == R.id.menu_sort_top_rated) {
+            sharedPreferencesEditor.putString(getString(R.string.preference_key_sort_by),
+                    getString(R.string.preference_option_sort_by_top_rated_value));
+            sharedPreferencesEditor.apply();
+            restartLoaderByPreference();
+            return true;
+        } else if (id == R.id.menu_sort_favorite) {
+            sharedPreferencesEditor.putString(getString(R.string.preference_key_sort_by),
+                    getString(R.string.preference_option_sort_by_favorites_value));
+            sharedPreferencesEditor.apply();
+            restartLoaderByPreference();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    private void restartLoaderByPreference() {
+        String sortBy = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                getString(R.string.preference_key_sort_by),
+                getString(R.string.preference_option_sort_by_popular_value));
+
+        if (sortBy.equals(getString(R.string.preference_option_sort_by_favorites_value))) {
+            getSupportLoaderManager().restartLoader(MOVIE_LIST_CURSOR_LOADER_ID, null, this);
+        } else {
+            getSupportLoaderManager().restartLoader(MOVIE_LIST_WEB_LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -100,7 +134,7 @@ public class MainActivity extends AppCompatActivity
             case MOVIE_LIST_CURSOR_LOADER_ID:
                 return new MovieCursorLoader(this);
             default:
-                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+                throw new RuntimeException("Loader not Implemented with id: " + loaderId);
         }
     }
 
@@ -134,7 +168,7 @@ public class MainActivity extends AppCompatActivity
         startActivity(startMovieDetailIntent);
     }
 
-    static class MovieWebLoader extends AsyncTaskLoader<List<Movie>> {
+    private static class MovieWebLoader extends AsyncTaskLoader<List<Movie>> {
         MovieWebLoader(Context context) {
             super(context);
         }
@@ -174,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static class MovieCursorLoader extends AsyncTaskLoader<List<Movie>> {
+    private static class MovieCursorLoader extends AsyncTaskLoader<List<Movie>> {
         MovieCursorLoader(Context context) {
             super(context);
         }

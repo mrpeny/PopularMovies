@@ -214,13 +214,13 @@ public class NetworkUtils {
     }
 
     public interface TmdbServiceApi {
-        @GET(BASE_URL_TMDB + MOVIE_VIDEOS_ENDPOINT_TMDB + "?" + API_KEY_PARAM_TMDB + "=" +
-                BuildConfig.API_KEY)
+        @GET(BASE_URL_TMDB + MOVIE_VIDEOS_ENDPOINT_TMDB + "?" + API_KEY_PARAM_TMDB + "="
+                + BuildConfig.API_KEY)
         Call<VideoListResponse> getVideosForMovie(@Path(MOVIE_ID_PATH_SEGMENT_TMDB) int movieId,
                                                   @Query(LANGUAGE_PARAM_TMDB) String languageTag);
 
         @GET(BASE_URL_TMDB + MOVIE_REVIEWS_ENDPOINT_TMDB + "?" + API_KEY_PARAM_TMDB + "=" +
-        BuildConfig.API_KEY)
+                BuildConfig.API_KEY)
         Call<ReviewListResponse> getReviewsForMovie(@Path(MOVIE_ID_PATH_SEGMENT_TMDB) int movieId,
                                                     @Query(LANGUAGE_PARAM_TMDB) String languageTag);
     }
