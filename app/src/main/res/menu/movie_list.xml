@@ -3,8 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/menu_settings"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_action_sort"
+        app:showAsAction="ifRoom"
+        android:title="@string/preference_title_sort_by">
+        <menu>
+            <item
+                android:id="@+id/menu_sort_popular"
+                android:title="@string/preference_option_sort_by_popular_label" />
+            <item
+                android:id="@+id/menu_sort_top_rated"
+                android:title="@string/preference_option_sort_by_top_rated_label" />
+            <item
+                android:id="@+id/menu_sort_favorite"
+                android:title="@string/preference_option_sort_by_favorites_label" />
+        </menu>
+    </item>
 </menu>
