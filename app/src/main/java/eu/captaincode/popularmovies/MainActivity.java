@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> movieList) {
         if (movieList == null || movieList.isEmpty()) {
             findViewById(R.id.tv_empty_view).setVisibility(View.VISIBLE);
+            findViewById(R.id.rv_main_movie_list).setVisibility(View.GONE);
             return;
         }
         mMovieList = movieList;
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUi() {
         findViewById(R.id.tv_empty_view).setVisibility(View.GONE);
+        findViewById(R.id.rv_main_movie_list).setVisibility(View.VISIBLE);
         mMovieListAdapter.setData(mMovieList);
         if (sPosition == RecyclerView.NO_POSITION) sPosition = 0;
         mRecyclerView.scrollToPosition(sPosition);
