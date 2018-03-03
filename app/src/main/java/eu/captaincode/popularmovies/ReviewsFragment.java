@@ -56,7 +56,7 @@ public class ReviewsFragment extends Fragment {
         mMovie = bundle.getParcelable(CategoryFragmentAdapter.KEY_MOVIE);
 
         setupRecyclerView();
-        showReviews();
+        loadReviews();
 
         return mFragmentReviewsBinding.getRoot();
     }
@@ -73,7 +73,7 @@ public class ReviewsFragment extends Fragment {
         mFragmentReviewsBinding.rvReviewsMovieDetail.setLayoutManager(linearLayoutManager);
     }
 
-    private void showReviews() {
+    private void loadReviews() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetworkUtils.BASE_URL_TMDB)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -90,21 +90,39 @@ public class ReviewsFragment extends Fragment {
                     ReviewListResponse reviewListResponse = response.body();
                     if (reviewListResponse != null) {
                         List<Review> reviewList = reviewListResponse.getmReviewList();
-
-                        mReviewListAdapter.setData(reviewList);
-
+                        if (reviewList.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            showReviewList();
+                            mReviewListAdapter.setData(reviewList);
+                        }
                     } else {
+                        showEmptyView();
                         Log.d(TAG, "No videos belong to this Movie");
                     }
                 } else {
+                    showEmptyView();
                     Log.d(TAG, "Failed to download movie videos");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ReviewListResponse> call, @NonNull Throwable t) {
+                showEmptyView();
                 Log.d(TAG, t.getMessage());
             }
         });
+    }
+
+    private void showReviewList() {
+        mFragmentReviewsBinding.tvEmptyViewReviewsFragment.setVisibility(View.
+                GONE);
+        mFragmentReviewsBinding.rvReviewsMovieDetail.setVisibility(View.VISIBLE);
+    }
+
+    private void showEmptyView() {
+        mFragmentReviewsBinding.tvEmptyViewReviewsFragment.setVisibility(View.
+                VISIBLE);
+        mFragmentReviewsBinding.rvReviewsMovieDetail.setVisibility(View.GONE);
     }
 }

@@ -6,7 +6,8 @@
     <string name="main_backdrop_iv_content_description">Movie backdrop image for
         <xliff:g example="The Godfather" id="movie_title">%1$s</xliff:g></string>
     <string name="main_movie_poster_image">Movie poster image</string>
-    <string name="main_internet_error_toast_message">Cannot connect to server. Check your internet connection!</string>
+    <string name="main_internet_error_toast_message">Cannot connect to server. Check your internet
+        connection!</string>
 
     <!-- Settings texts -->
     <string name="menu_settings">Settings</string>
@@ -22,9 +23,20 @@
     <string name="preference_option_sort_by_favorites_value" translatable="false">favorites</string>
 
     <!-- MovieDetailActivity texts -->
+    <!-- Tab titles START -->
+    <string name="movie_detail_overview_page_title">Overview</string>
+    <string name="movie_detail_trailers_page_title">Trailers</string>
+    <string name="movie_detail_reviews_page_title">Reviews</string>
+    <!-- Tab titles END -->
     <string name="release_date_movie_detail">Release date:
         <xliff:g example="February 7, 2018" id="release_date">%1$s</xliff:g></string>
     <string name="movie_detail_video_thumbnail_image">Movie Trailer thumbnail image</string>
+    <string name="movie_detail_added_to_favorites">Added to favorites</string>
+    <string name="movie_detail_removed_from_favorites">Removed from favorites</string>
+    <string name="fragment_reviews_no_reviews">This movie has no reviews or there is no internet
+        connection.</string>
+    <string name="fragment_trailers_no_trailers">This movie has no trailers or there is no internet
+        connection.</string>
 
     <!-- TMDB Web Api parameters -->
     <string name="backdrop_size_path_tmdb" translatable="false">w780</string>
@@ -32,12 +44,4 @@
 
     <!-- AndroidManifest strings -->
     <string name="content_authority" translatable="false">eu.captaincode.popularmovies</string>
-
-    <!-- Tab titles -->
-    <string name="movie_detail_overview_page_title">Overview</string>
-    <string name="movie_detail_trailers_page_title">Trailers</string>
-    <string name="movie_detail_reviews_page_title">Reviews</string>
-    <string name="movie_detail_added_to_favorites">Added to favorites</string>
-    <string name="movie_detail_removed_from_favorites">Removed from favorites</string>
-
 </resources>

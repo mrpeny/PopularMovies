@@ -56,7 +56,7 @@ public class VideosFragment extends Fragment {
         mMovie = bundle.getParcelable(CategoryFragmentAdapter.KEY_MOVIE);
 
         setupRecyclerView();
-        showVideos();
+        loadVideos();
 
         return mFragmentTrailersBinding.getRoot();
     }
@@ -69,7 +69,7 @@ public class VideosFragment extends Fragment {
         mFragmentTrailersBinding.rvVideosMovieDetail.setLayoutManager(linearLayoutManager);
     }
 
-    private void showVideos() {
+    private void loadVideos() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetworkUtils.BASE_URL_TMDB)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -86,26 +86,51 @@ public class VideosFragment extends Fragment {
                     VideoListResponse videoListResponse = response.body();
                     if (videoListResponse != null) {
                         List<Video> videoList = videoListResponse.getVideoList();
-
-                        for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
-                            Video video = iterator.next();
-                            if (!video.getType().equals(VIDEO_TYPE_TRAILER)) {
-                                iterator.remove();
-                            }
+                        videoList = selectTrailers(videoList);
+                        if (videoList.isEmpty()) {
+                            showEmptyView();
+                        } else {
+                            showVideoList();
                             mVideoListAdapter.setData(videoList);
                         }
                     } else {
+                        showEmptyView();
                         Log.d(TAG, "No videos belong to this Movie");
                     }
                 } else {
+                    showEmptyView();
                     Log.d(TAG, "Failed to download movie videos");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<VideoListResponse> call, @NonNull Throwable t) {
+                showEmptyView();
                 Log.d(TAG, t.getMessage());
             }
         });
+    }
+
+    private List<Video> selectTrailers(List<Video> videoList) {
+        for (Iterator<Video> iterator = videoList.iterator(); iterator.hasNext(); ) {
+            Video video = iterator.next();
+            if (!video.getType().equals(VIDEO_TYPE_TRAILER)) {
+                iterator.remove();
+            }
+        }
+        return videoList;
+    }
+
+    private void showVideoList() {
+        mFragmentTrailersBinding.tvEmptyViewTrailersFragment.setVisibility(View.
+                GONE);
+        mFragmentTrailersBinding.rvVideosMovieDetail.setVisibility(View.VISIBLE);
+    }
+
+    private void showEmptyView() {
+        mFragmentTrailersBinding.tvEmptyViewTrailersFragment.setVisibility(View.
+                VISIBLE);
+        mFragmentTrailersBinding.rvVideosMovieDetail.setVisibility(View.
+                GONE);
     }
 }
