@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -13,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -127,12 +127,16 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
     @Override
     public void onInsertComplete() {
         mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
-        Toast.makeText(this, mMovie.getTitle() + " is marked as favorite", Toast.LENGTH_SHORT).show();
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main_movie_detail),
+                R.string.movie_detail_added_to_favorites, Snackbar.LENGTH_SHORT);
+        mySnackbar.show();
     }
 
     @Override
     public void onDeleteComplete() {
         mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_false_24dp);
-        Toast.makeText(this, mMovie.getTitle() + " is deleted from favorites", Toast.LENGTH_SHORT).show();
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main_movie_detail),
+                R.string.movie_detail_removed_from_favorites, Snackbar.LENGTH_SHORT);
+        mySnackbar.show();
     }
 }

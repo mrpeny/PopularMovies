@@ -37,5 +37,7 @@
     <string name="movie_detail_overview_page_title">Overview</string>
     <string name="movie_detail_trailers_page_title">Trailers</string>
     <string name="movie_detail_reviews_page_title">Reviews</string>
+    <string name="movie_detail_added_to_favorites">Added to favorites</string>
+    <string name="movie_detail_removed_from_favorites">Removed from favorites</string>
 
 </resources>
