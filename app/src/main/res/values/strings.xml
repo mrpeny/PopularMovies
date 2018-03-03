@@ -26,12 +26,16 @@
         <xliff:g example="February 7, 2018" id="release_date">%1$s</xliff:g></string>
     <string name="movie_detail_video_thumbnail_image">Movie Trailer thumbnail image</string>
 
-
     <!-- TMDB Web Api parameters -->
     <string name="backdrop_size_path_tmdb" translatable="false">w780</string>
     <string name="poster_size_path_tmdb" translatable="false">w185</string>
 
     <!-- AndroidManifest strings -->
     <string name="content_authority" translatable="false">eu.captaincode.popularmovies</string>
+
+    <!-- Tab titles -->
+    <string name="movie_detail_overview_page_title">Overview</string>
+    <string name="movie_detail_trailers_page_title">Trailers</string>
+    <string name="movie_detail_reviews_page_title">Reviews</string>
 
 </resources>

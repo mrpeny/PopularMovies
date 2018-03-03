@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="movie" type="eu.captaincode.popularmovies.model.Movie" />
+
+        <variable
+            name="movie"
+            type="eu.captaincode.popularmovies.model.Movie" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -44,6 +47,22 @@
                     app:title="@{movie.title}" />
 
             </android.support.design.widget.CollapsingToolbarLayout>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="bottom"
+                android:background="#00000000"
+                app:layout_anchor="@+id/abl_main_movie_detail"
+                app:layout_anchorGravity="bottom"
+                app:layout_collapseMode="none"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="#fff"
+                app:tabIndicatorHeight="2dp"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="#fff"
+                app:tabTextColor="#fff" />
+
         </android.support.design.widget.AppBarLayout>
 
         <android.support.design.widget.FloatingActionButton
@@ -52,6 +71,12 @@
             android:onClick="onFabClick"
             app:layout_anchor="@id/abl_main_movie_detail"
             app:layout_anchorGravity="bottom|right|end" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -64,92 +89,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/iv_poster_image_movie_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/poster_image_height_movie_detail"
-                    android:adjustViewBounds="true"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription"
-                    tools:src="@drawable/poster_placeholder" />
 
-                <TextView
-                    android:id="@+id/tv_movie_title_movie_detail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/movie_detail_poster_padding"
-                    android:text="@{movie.title}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/iv_poster_image_movie_detail"
-                    app:layout_constraintTop_toTopOf="@id/iv_poster_image_movie_detail"
-                    tools:text="The Godfather" />
 
-                <TextView
-                    android:id="@+id/tv_release_date_movie_detail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/line_margin_movie_detail"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toLeftOf="@id/tv_movie_title_movie_detail"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/tv_movie_title_movie_detail"
-                    app:layout_constraintTop_toBottomOf="@id/tv_movie_title_movie_detail"
-                    tools:text="Release date: February 7, 2018" />
 
-                <FrameLayout
-                    android:id="@+id/fl_vote_average_movie_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="@id/tv_release_date_movie_detail"
-                    app:layout_constraintLeft_toLeftOf="@id/tv_release_date_movie_detail"
-                    app:layout_constraintRight_toRightOf="@id/tv_release_date_movie_detail"
-                    app:layout_constraintStart_toStartOf="@id/tv_release_date_movie_detail"
-                    app:layout_constraintTop_toBottomOf="@id/tv_release_date_movie_detail">
-
-                    <ProgressBar
-                        android:id="@+id/circularProgressbar"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="@dimen/progress_bar_width_height"
-                        android:layout_height="@dimen/progress_bar_width_height"
-                        android:indeterminate="false"
-                        android:max="100"
-                        android:progressDrawable="@drawable/circular"
-                        android:secondaryProgress="100"
-                        tools:progress="65" />
-
-                    <TextView
-                        android:id="@+id/tv_vote_average_number_movie_detail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        tools:text="6.5" />
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tv_overview_movie_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginStart="16dp"
-                    android:text="@{movie.overView}"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/fl_vote_average_movie_detail"
-                    tools:text="A gengszterfilmek legnagyobbika, világhírű színészek és rendező munkája, minden idők egyik legnagyobb szabású maffiafilmje, a Keresztapa." />
+                <View
+                    android:id="@+id/divider_movie_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="@dimen/movie_detail_poster_padding"
+                    android:layout_marginTop="@dimen/movie_detail_poster_padding"
+                    android:background="@color/colorPrimary"
+                    app:layout_constraintTop_toBottomOf="@id/rv_videos_movie_detail" />
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_videos_movie_detail"
+                    android:id="@+id/rv_reviews_movie_detail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/padding_bottom_rv"
-                    app:layout_constraintTop_toBottomOf="@id/tv_overview_movie_detail">
+                    app:layout_constraintTop_toBottomOf="@id/divider_movie_detail">
 
                 </android.support.v7.widget.RecyclerView>
 

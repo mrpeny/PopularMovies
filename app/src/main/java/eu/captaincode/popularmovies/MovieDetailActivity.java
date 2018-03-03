@@ -7,6 +7,8 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,15 +20,11 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
+import eu.captaincode.popularmovies.adapters.CategoryFragmentAdapter;
 import eu.captaincode.popularmovies.adapters.VideoListAdapter;
 import eu.captaincode.popularmovies.data.MovieContract;
 import eu.captaincode.popularmovies.databinding.ActivityMovieDetailBinding;
@@ -35,7 +33,6 @@ import eu.captaincode.popularmovies.model.Movie;
 import eu.captaincode.popularmovies.model.Video;
 import eu.captaincode.popularmovies.utilities.MovieObjectRelationMapper;
 import eu.captaincode.popularmovies.utilities.NetworkUtils;
-import eu.captaincode.popularmovies.utilities.TmdbJsonUtils;
 import eu.captaincode.popularmovies.utilities.VideoListResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,11 +43,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MovieDetailActivity extends AppCompatActivity implements FavoritesAsyncQueryHandler.AsyncQueryListener {
     private static final String TAG = MovieDetailActivity.class.getSimpleName();
 
-    private static final int PERCENT_MULTIPLIER_VOTE_AVERAGE = 10;
     private static final String VIDEO_TYPE_TRAILER = "Trailer";
 
     private Movie mMovie;
     private List<Video> mVideoList = new ArrayList<>();
+    private CategoryFragmentAdapter categoryFragmentAdapter;
 
     private VideoListAdapter mVideoListAdapter;
     private FavoritesAsyncQueryHandler mQueryHandler;
@@ -80,6 +77,15 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
         // Object used to perform CRUD operations on the DB
         mQueryHandler = new FavoritesAsyncQueryHandler(getContentResolver(), this);
 
+        categoryFragmentAdapter = new CategoryFragmentAdapter(getSupportFragmentManager(), this,
+                mMovie);
+
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(categoryFragmentAdapter);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setTabsFromPagerAdapter(categoryFragmentAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
         mVideoListAdapter = new VideoListAdapter(this, mVideoList);
         mMovieDetailBinding.rvVideosMovieDetail.setAdapter(mVideoListAdapter);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this,
@@ -90,21 +96,8 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
     }
 
     private void showMovieDetails() {
-        mMovieDetailBinding.setMovie(mMovie);
         showBackdropImage();
-        showPosterImage();
-        showReleaseDate();
-        mMovieDetailBinding.tvVoteAverageNumberMovieDetail.setText(String.valueOf(mMovie
-                .getVoteAverage()));
-        mMovieDetailBinding.circularProgressbar.setProgress((int) (mMovie.getVoteAverage() *
-                PERCENT_MULTIPLIER_VOTE_AVERAGE));
-        // Run a background query to check if mMovie is a part of favorites. Result evaluation in
-        // onQueryComplete(Cursor cursor) callback
-        mQueryHandler.startQuery(0, null, MovieContract.MovieEntry.CONTENT_URI,
-                new String[]{MovieContract.MovieEntry._ID},
-                MovieContract.MovieEntry.COLUMN_ID_TMDB + " = ?",
-                new String[]{String.valueOf(mMovie.getId())},
-                null);
+        showIfFavorite();
         showVideos();
     }
 
@@ -116,29 +109,14 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
                 .main_backdrop_iv_content_description, mMovie.getTitle()));
     }
 
-    private void showPosterImage() {
-        Uri posterUri = NetworkUtils.getPosterImageUriFor(this, mMovie.getPosterPath());
-        Picasso.with(this).load(posterUri).into(mMovieDetailBinding.ivPosterImageMovieDetail);
-        mMovieDetailBinding.ivPosterImageMovieDetail.setContentDescription(getString(R.string
-                .main_poster_iv_content_description, mMovie.getTitle()));
-    }
-
-    private void showReleaseDate() {
-        String releaseDateString = mMovie.getDate();
-        try {
-            Date releaseDate = new SimpleDateFormat(TmdbJsonUtils.DATE_FORMAT_TMDB, Locale
-                    .getDefault()).parse(releaseDateString);
-            String localeReleaseDate = DateFormat.getDateInstance(DateFormat.LONG)
-                    .format(releaseDate);
-            String labeledReleaseDate = getString(R.string.release_date_movie_detail,
-                    localeReleaseDate);
-            mMovieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
-        } catch (ParseException e) {
-            String labeledReleaseDate = getString(R.string.release_date_movie_detail,
-                    releaseDateString);
-            mMovieDetailBinding.tvReleaseDateMovieDetail.setText(labeledReleaseDate);
-            e.printStackTrace();
-        }
+    private void showIfFavorite() {
+        // Run a background query to check if mMovie is a part of favorites. Result evaluation in
+        // onQueryComplete(Cursor cursor) callback
+        mQueryHandler.startQuery(0, null, MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry._ID},
+                MovieContract.MovieEntry.COLUMN_ID_TMDB + " = ?",
+                new String[]{String.valueOf(mMovie.getId())},
+                null);
     }
 
     private void showVideos() {
