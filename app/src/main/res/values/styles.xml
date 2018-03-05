@@ -14,19 +14,38 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="appbarLayout">
+    <!-- General styles -->
+    <style name="AppbarLayout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
-    <style name="movieToolbar">
+    <style name="EmptyView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:drawablePadding">@dimen/padding_bottom_all_empty_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <!-- MainActivity styles -->
+    <style name="MovieToolbar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">?attr/actionBarSize</item>
         <item name="android:background">?attr/colorPrimary</item>
     </style>
 
-    <style name="FabStyle">
+    <!-- Detail Activity styles -->
+    <style name="BackdropImageMovieDetail">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="FabStyleMovieDetail">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">8dp</item>
@@ -36,4 +55,55 @@
         <item name="rippleColor">@android:color/white</item>
     </style>
 
+    <style name="PosterImageOverviewFragment">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/poster_image_height_movie_detail</item>
+        <item name="android:adjustViewBounds">true</item>
+    </style>
+
+    <style name="TitleTextOverviewFragment">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/movie_detail_poster_padding</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <style name="ReleaseDateTextOverviewFragment">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/line_margin_movie_detail</item>
+        <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="VoteAverageTextOverview">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+
+    <!-- List item styles -->
+    <style name="VideoThumbnailImageTrailers">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/video_list_item_image_height</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:contentDescription">@string/movie_detail_video_thumbnail_image</item>
+    </style>
+
+    <style name="VideoTitleTrailers">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">start|top</item>
+        <item name="android:layout_marginStart">@dimen/video_thumbnail_recycler_margin</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <style name="AuthorTextReviews">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <style name="ContentTextReviews">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 </resources>

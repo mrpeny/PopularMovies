@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- MainActivity integer resources -->
-    <integer name="main_grid_span_count">2</integer>
+    <integer name="grid_span_count_main">2</integer>
+    <integer name="max_value_progress_bar_overview">100</integer>
 </resources>

@@ -17,24 +17,21 @@
             android:id="@+id/abl_main_movie_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/appbarLayout">
+            android:theme="@style/AppbarLayout">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/ctl_main_movie_detail"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/collapsing_toolbar_height"
+                android:layout_height="@dimen/height_collapsing_toolbar"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleTextAppearance="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/iv_movie_detail_backdrop"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fitsSystemWindows="true"
-                    android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription"
+                    style="@style/BackdropImageMovieDetail" />
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar_movie_detail"
@@ -48,7 +45,7 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
-            style="@style/FabStyle"
+            style="@style/FabStyleMovieDetail"
             app:srcCompat="@drawable/ic_favorite_false_24dp"
             android:onClick="onFabClick"
             app:layout_anchor="@id/abl_main_movie_detail"
@@ -63,7 +60,7 @@
             app:layout_anchorGravity="bottom"
             app:layout_collapseMode="none"
             app:tabGravity="fill"
-            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorHeight="@dimen/height_tab_indicator_movie_detail"
             app:tabMode="scrollable" />
 
         <android.support.v4.view.ViewPager

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,29 +11,22 @@
         android:id="@+id/rv_main_movie_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </android.support.v7.widget.RecyclerView>
-
-    <android.support.design.widget.AppBarLayout style="@style/appbarLayout">
+    <android.support.design.widget.AppBarLayout style="@style/AppbarLayout">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/main_toolbar"
-            style="@style/movieToolbar"
+            style="@style/MovieToolbar"
             app:layout_scrollFlags="scroll|enterAlways" />
 
     </android.support.design.widget.AppBarLayout>
 
-        <TextView
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:id="@+id/tv_empty_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:drawablePadding="@dimen/padding_bottom_rv"
-            android:drawableTop="@drawable/poster_placeholder"
-            android:gravity="center"
-            android:text="@string/main_internet_error_toast_message"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/tv_empty_view"
+        style="@style/EmptyView"
+        android:text="@string/main_internet_error_toast_message"
+        android:drawableTop="@drawable/poster_placeholder"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

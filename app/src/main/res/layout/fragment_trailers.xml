@@ -9,7 +9,7 @@
             android:id="@+id/rv_videos_movie_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/fragment_padding" />
+            android:padding="@dimen/padding_general_fragments" />
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -17,15 +17,10 @@
 
             <TextView
                 android:id="@+id/tv_empty_view_trailers_fragment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:drawablePadding="@dimen/padding_bottom_rv"
+                style="@style/EmptyView"
                 android:drawableTop="@drawable/image_empty"
-                android:gravity="center"
                 android:padding="@dimen/padding_general"
-                android:text="@string/fragment_trailers_no_trailers"
-                android:visibility="gone" />
+                android:text="@string/fragment_trailers_no_trailers" />
         </android.support.v4.widget.NestedScrollView>
     </FrameLayout>
 </layout>

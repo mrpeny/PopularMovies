@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         mMovieListAdapter = new MovieListAdapter(this, mMovieList, this);
         mRecyclerView.setAdapter(mMovieListAdapter);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,
-                getResources().getInteger(R.integer.main_grid_span_count));
+                getResources().getInteger(R.integer.grid_span_count_main));
         mRecyclerView.setLayoutManager(layoutManager);
 
         Toolbar myToolbar = findViewById(R.id.main_toolbar);

@@ -5,23 +5,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/padding_bottom_rv"
-    android:paddingBottom="@dimen/padding_bottom_rv">
+    android:paddingTop="@dimen/padding_general_fragments"
+    android:paddingBottom="@dimen/padding_general_fragments">
 
     <TextView
         android:id="@+id/tv_author_review_list_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Hamadam"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+        style="@style/AuthorTextReviews" />
 
     <TextView
         android:id="@+id/tv_content_review_list_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@+id/tv_author_review_list_item"
         app:layout_constraintTop_toBottomOf="@+id/tv_author_review_list_item"
-        tools:text="I like the occasional crossover but when Flash started, and then Supergirl... argh. I don'T watch those other two shows, but somewhere along the way I felt like I had to just to follow along in THIS show." />
+        tools:text="I like the occasional crossover but when Flash started, and then Supergirl... argh. I don'T watch those other two shows, but somewhere along the way I felt like I had to just to follow along in THIS show."
+        style="@style/ContentTextReviews" />
 </android.support.constraint.ConstraintLayout>
