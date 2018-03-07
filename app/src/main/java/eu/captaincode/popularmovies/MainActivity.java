@@ -2,7 +2,6 @@ package eu.captaincode.popularmovies;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -165,9 +164,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMovieClick(int position) {
         sPosition = position;
-        Intent startMovieDetailIntent = new Intent(this, MovieDetailActivity.class);
-        startMovieDetailIntent.putExtra(EXTRA_KEY_MOVIE, mMovieList.get(position));
-        startActivity(startMovieDetailIntent);
+        MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
+        Bundle bundle = new Bundle(1);
+        bundle.putParcelable(EXTRA_KEY_MOVIE, mMovieList.get(position));
+        movieDetailFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_movie_detail, movieDetailFragment)
+                .commit();
     }
 
     private static class MovieWebLoader extends AsyncTaskLoader<List<Movie>> {

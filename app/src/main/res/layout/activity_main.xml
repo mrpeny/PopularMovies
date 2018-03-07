@@ -7,12 +7,6 @@
     android:layout_height="match_parent"
     tools:context="eu.captaincode.popularmovies.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_main_movie_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <android.support.design.widget.AppBarLayout style="@style/AppbarLayout">
 
         <android.support.v7.widget.Toolbar
@@ -21,6 +15,13 @@
             app:layout_scrollFlags="scroll|enterAlways" />
 
     </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_main_movie_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <TextView
         android:id="@+id/tv_empty_view"
