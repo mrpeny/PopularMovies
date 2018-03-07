@@ -46,7 +46,7 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
             return;
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar_movie_detail);
+        Toolbar toolbar = mMovieDetailBinding.toolbarMovieDetail;
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -58,9 +58,9 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
 
         CategoryFragmentAdapter categoryFragmentAdapter = new CategoryFragmentAdapter(
                 getSupportFragmentManager(), this, mMovie);
-        ViewPager viewPager = findViewById(R.id.view_pager);
+        ViewPager viewPager = mMovieDetailBinding.viewPager;
         viewPager.setAdapter(categoryFragmentAdapter);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        TabLayout tabLayout = mMovieDetailBinding.tabLayout;
         tabLayout.setupWithViewPager(viewPager);
 
         showMovieDetails();
@@ -127,16 +127,14 @@ public class MovieDetailActivity extends AppCompatActivity implements FavoritesA
     @Override
     public void onInsertComplete() {
         mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_true_24dp);
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main_movie_detail),
-                R.string.movie_detail_added_to_favorites, Snackbar.LENGTH_SHORT);
-        mySnackbar.show();
+        Snackbar.make(mMovieDetailBinding.clMainMovieDetail,
+                R.string.movie_detail_added_to_favorites, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteComplete() {
         mMovieDetailBinding.fab.setImageResource(R.drawable.ic_favorite_false_24dp);
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.cl_main_movie_detail),
-                R.string.movie_detail_removed_from_favorites, Snackbar.LENGTH_SHORT);
-        mySnackbar.show();
+        Snackbar.make(mMovieDetailBinding.clMainMovieDetail,
+                R.string.movie_detail_removed_from_favorites, Snackbar.LENGTH_SHORT).show();
     }
 }
